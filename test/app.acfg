@@ -1,0 +1,5 @@
+{
+    "Bat.BusVolt": "float",
+    "Bat.BusCurr": "float",
+    "Bat.SOC": "float"
+}

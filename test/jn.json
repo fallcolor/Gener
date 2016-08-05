@@ -1,0 +1,197 @@
+{
+  "CANmessage": {
+    "150077600": {
+      "transmit": false, 
+      "signal": [
+        "LZ_VehSpd", 
+        "LZ_ChgDrvMode", 
+        "LZ_DcChgCC2", 
+        "LZ_AcChgCC2", 
+        "LZ_ChgMode", 
+        "LZ_KeySgl", 
+        "LZ_VehGear", 
+        "LZ_VehMode", 
+        "LZ_AccPedalStt", 
+        "AdSignal"
+      ], 
+      "name": "VCU2IPK3"
+    }, 
+    "4993": {
+      "transmit": false, 
+      "signal": [
+        "DCDC_Limits_ctRoll", 
+        "DC_ActTemp", 
+        "DC_udcLvActSetP", 
+        "DC02_bDernUndrUdcHv", 
+        "DC02_bDernOvrIdcHv", 
+        "DC02_bDernOvrUdcLv", 
+        "DC02_bDernOvrIdcLv", 
+        "DC02_bErrShtOff", 
+        "DC02_bDernUndrUdcLv", 
+        "DC02_bErrVltg", 
+        "DC02_bDernOvrUdcHv", 
+        "DC02_bDernTemp", 
+        "DC02_bErrLimitedPerformance"
+      ], 
+      "name": "DCDC_Limits"
+    }, 
+    "208785618": {
+      "transmit": false, 
+      "signal": [
+        "BAT_Volt", 
+        "BAT_SOH", 
+        "BAT_SOC", 
+        "BAT_Curr", 
+        "BAT_AvgCellVolt"
+      ], 
+      "name": "BMS_Voltage"
+    }, 
+    "410243282": {
+      "transmit": false, 
+      "signal": [
+        "BAT_MinVoltBoxNo", 
+        "BAT_MinVoltCellNo", 
+        "BAT_MinCellVolt", 
+        "BAT_MaxVoltBoxNo", 
+        "BAT_MaxVoltCellNo", 
+        "BAT_MaxCellVolt"
+      ], 
+      "name": "BMS_CellVoltage"
+    }, 
+    "208326865": {
+      "transmit": false, 
+      "signal": [
+        "TM_InvTemp", 
+        "TM_MtrTemp", 
+        "TM_EnergyActl", 
+        "TM_PowerActl"
+      ], 
+      "name": "TM_State3"
+    }, 
+    "4968": {
+      "transmit": false, 
+      "signal": [
+        "DCDC_ErrStt2", 
+        "DCDC_ErrStt1", 
+        "DCDC_SWVersion", 
+        "DCDC_ID", 
+        "DC_FailSt_Inverted", 
+        "DC_FailSt", 
+        "DCDC_Failure_ctRoll"
+      ], 
+      "name": "DCDC_Failure"
+    }, 
+    "208261329": {
+      "transmit": false, 
+      "signal": [
+        "TM_CurrActl", 
+        "TM_Efficency", 
+        "TM_Volt_C"
+      ], 
+      "name": "TM_State2"
+    }, 
+    "410374354": {
+      "transmit": false, 
+      "signal": [
+        "BAT_MinCellTempLimt", 
+        "BAT_MaxCellTempLimt", 
+        "BAT_MinSOCLimt", 
+        "BAT_MaxSOCLimt", 
+        "BAT_MinCellVoltLimt", 
+        "BAT_MaxCellVoltLimt"
+      ], 
+      "name": "BMS_Limit1"
+    }, 
+    "208392656": {
+      "transmit": true, 
+      "signal": [
+        "VCU_SpdSet", 
+        "VCU_MtrCtrlMode", 
+        "VCU_BrpSwh", 
+        "VCU_AccSgl", 
+        "VCU_TrqSet", 
+        "VCU_TMEnable", 
+        "VCU_TMSttCmd"
+      ], 
+      "name": "VCU_TM"
+    }, 
+    "4776": {
+      "transmit": false, 
+      "signal": [
+        "HCU_SystemFailureMode", 
+        "idcLvSetP", 
+        "IPU_DCDC_Ctrl_ctRoll", 
+        "StModeReq", 
+        "udcLvSetP"
+      ], 
+      "name": "IPU_DCDC_Ctrl"
+    }, 
+    "410439890": {
+      "transmit": false, 
+      "signal": [
+        "BAT_MinDisChgVolt", 
+        "BAT_MaxChgVolt", 
+        "BAT_MaxDisChgCurr", 
+        "BAT_MaxChgCurr"
+      ], 
+      "name": "BMS_Limit2"
+    }, 
+    "208195793": {
+      "transmit": false, 
+      "signal": [
+        "TM_WarnStt", 
+        "TM_TrqMax", 
+        "TM_SpdActl", 
+        "TM_TrqActl", 
+        "TM_CtrlMode", 
+        "TM_Stt"
+      ], 
+      "name": "TM_State1"
+    }, 
+    "208851154": {
+      "transmit": false, 
+      "signal": [
+        "BAT_Stt", 
+        "BAT_MaxPoleTemp", 
+        "BAT_Err3", 
+        "BAT_Err2", 
+        "BAT_Err1", 
+        "BAT_BoxStt"
+      ], 
+      "name": "BMS_State"
+    }, 
+    "4985": {
+      "transmit": false, 
+      "signal": [
+        "DC_ActCurAtHV", 
+        "DC_ActCurAtLV", 
+        "DC_ActLowVolt", 
+        "DC_ActHighVolt", 
+        "DCDC_General_ctRoll", 
+        "DC_StMode"
+      ], 
+      "name": "DCDC_General"
+    }, 
+    "209179344": {
+      "transmit": true, 
+      "signal": [
+        "VCU_HVEnable", 
+        "VCU_TMVolt"
+      ], 
+      "name": "VCU_HVEnable"
+    }, 
+    "410308818": {
+      "transmit": false, 
+      "signal": [
+        "BAT_MinTempBoxNo", 
+        "BAT_MinTempCellNo", 
+        "BAT_MinCellTemp", 
+        "BAT_MaxTempBoxNo", 
+        "BAT_MaxTempCellNo", 
+        "BAT_MaxCellTemp"
+      ], 
+      "name": "BMS_CellTemperature"
+    }
+  }, 
+  "HardwareIO": {}
+}
