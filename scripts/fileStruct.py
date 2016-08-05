@@ -13,7 +13,6 @@
 import time
 
 commentSgl = '//'
-indentationNum = 4
 
 class CommentStr(object):
     ''' class for comment
@@ -58,42 +57,99 @@ class FileInclud(object):
                 tmplist.append('#include ' + '"' + fl + '"')
         return tmplist
 
+class FuncEle(object):
+    def __init__(self, elecomment = ['element comment'], elebody = []):
+        self._elecomm = elecomment
+        self._elebody = elebody
+    def AddComment(self, comm):
+        self._elecomm = comm 
+    def AddBody(self,bd):
+        self._elebody = bd
+    def GetStr(self, inden = 4):
+        tmplist = []
+        for li in self._elecomm:
+            tmplist.append(' ' * inden + '// ' + li)
+        if self._elebody:
+            for li in self._elebody:
+                tmplist.append(' ' * inden + li)
+            # return tmplist
+        tmplist[-1] += '\n'
+        return tmplist
+
 class FuncBody(object):
     def __init__(self):
-        
+        self._para = 'void'
+        self._eles = []
+    def AddFuncName(self, name):
+        self._name = name
+    def AddFuncComment(self, commstr):
+        self._comment = CommentStr(commstr).GetStr()
+    def AddFuncPara(self, Arg):        
+        self._para = Arg
+    def AddFuncEle(self, ele):
+        self._eles.append(ele)
+    def GetStr(self, inden = 4):
+        tmplist = []
+        # function comment
+        tmplist.append(self._comment)
+        # function name
+        tmplist.append('void ' + self._name + '(' + self._para + ')')
+        tmplist.append('{')
+        # function elements
+        for li in self._eles:
+            tmplist.extend(li.GetStr(inden))
+        tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
+        # function end
+        tmplist.append('}')
+        return tmplist
 
 class SourceFile(object):
     def __init__(self):
+        self._indentationNum = 4    
         self._filehead = FileHead()
         self._fileinclude = FileInclud()
+        self._funclist = []
     def AddFilehead(self, filename = '', author = 'pk', descrip = ''):
         self._filehead.AddProperty(filename, author, descrip)
     def AddFileInclude(self, filelist):
         self._fileinclude.AddProperty(filelist)
+    def AddFunc(self, func):
+        self._funclist.append(func)
     def GetStr(self):
         tmpstr = ''
-        for li in self._filehead.GetStr():
-            tmpstr += li + '\n'
-        tmpstr += '\n'
-        for li in self._fileinclude.GetStr():
-            tmpstr += li + '\n'
+        # file head
+        tmpstr += '\n'.join(self._filehead.GetStr()) + '\n\n'
+        # file include
+        tmpstr += '\n'.join(self._fileinclude.GetStr()) + '\n\n'
+        # functions
+        for func in self._funclist:
+            tmpstr += '\n'.join(func.GetStr(self._indentationNum)) + '\n\n'
+
+        # file end
+        tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr
 
 def test():
-    # fh = FileHead('sdfsdf.c', 'pk', 'sdfsdfsdfsdfsdf')
-    # for li in fh.GetStr():
-    #     print li
-
-    # fi1 = FileInclud()
-    # for li in fi1.GetStr():
-    #     print li
-    # fi2 = FileInclud(['asdf.h', 'sfwef.h'])
-    # for li in fi2.GetStr():
-    #     print li
-
     sf = SourceFile()
     sf.AddFilehead('main.c','pk','ok')
     sf.AddFileInclude(['stdio.h', 'math.h'])
+
+    f1 = FuncBody()
+    f1.AddFuncComment('f1')
+    f1.AddFuncName('unpack0x1313FF01')
+    f1.AddFuncPara('char* data, int num')
+    f1.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
+    f1.AddFuncEle(FuncEle(['signalname', 'startbit','leng'], ['busvolt = data[0];']))
+    sf.AddFunc(f1)
+
+    f2 = FuncBody()
+    f2.AddFuncComment('f2')
+    f2.AddFuncName('unpack0x1313FF01')
+    f2.AddFuncPara('char* data, int num')
+    f2.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
+    f2.AddFuncEle(FuncEle(['signalname', 'startbit','leng'], ['busvolt = data[0];']))
+    sf.AddFunc(f2)
+
     print sf.GetStr()
 
 if __name__ == '__main__':
