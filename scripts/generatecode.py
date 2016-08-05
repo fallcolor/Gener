@@ -3,7 +3,7 @@
 from GainString import *
 from ImportData import *
 '''
-tba: It's much better, if a signal match a value, delete the value from the list of sv.
+tba: It's much better if a signal match a value, delete the value from the list of sv.
 '''
 desFile = r'e:/ks.c'
 # desFile = r'/Users/caopengkun/python/Gener/ks.c'
