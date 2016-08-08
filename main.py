@@ -244,6 +244,13 @@ class VarSglMaps(object):
                 self.ImportSv(tmpfile)
                 self._code = gc.GenerateCode(self._dbc, self._svm)
                 print self._code
+                try:
+                    fi = open('e:/ks.c', 'w')
+                    fi.write(GenerateCode(db, sv))
+                    fi.close()
+                    print 'success for generated!'
+                except:
+                    print 'error'
         else:
             tkMessageBox.showinfo("error","请选择App Config文件")
 

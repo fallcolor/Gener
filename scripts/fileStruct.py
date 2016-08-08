@@ -72,7 +72,6 @@ class FuncEle(object):
         if self._elebody:
             for li in self._elebody:
                 tmplist.append(' ' * inden + li)
-            # return tmplist
         tmplist[-1] += '\n'
         return tmplist
 
@@ -124,7 +123,6 @@ class SourceFile(object):
         # functions
         for func in self._funclist:
             tmpstr += '\n'.join(func.GetStr(self._indentationNum)) + '\n\n'
-
         # file end
         tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr

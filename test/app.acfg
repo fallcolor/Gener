@@ -1,5 +1,8 @@
 {
     "Bat.BusVolt": "float",
     "Bat.BusCurr": "float",
-    "Bat.SOC": "float"
+    "Bat.SOC": "float",
+    "Tm.TmTrq": "float",
+    "Tm.TmSpd": "float",
+    "Tm.TmVolt": "float"
 }
