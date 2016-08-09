@@ -35,7 +35,7 @@ def StartGui():
 
     inhcfg = FileDeal(root, cbfunc = vrms.ImportData, inText = 'input hcfg')
     inhcfg.ConfigOpen('configuration for hardware', '.hcfg', 'Open hcfg')
-    inhcfg.pack() 
+    inhcfg.pack()
 
     indbc = FileDeal(root, cbfunc = vrms.ImportData, inText = 'input dbc')
     indbc.ConfigOpen('data for can', '.dbc', 'Open dbc')
@@ -44,13 +44,7 @@ def StartGui():
     geneBtn = Button(root, text = "generate code", command = vrms.GenerateCode)
     geneBtn.pack()
 
-    # sssss = SignalMap(root)
-    # sssss.pack()
-
     root.mainloop()
-
-
-
 
 class FileDeal(object):
     def __init__(self, rootCom, cbfunc = None, inText = "FileDeal"):
@@ -154,14 +148,6 @@ class SignalMap(object):
         self._combo1.pack(side = LEFT)
         self._combo2.pack(side = LEFT)
         self._combo3.pack(side = LEFT)
-
-# class VarSglMap:
-#     def __init__(self, varName):
-#         self._var = varName
-#         self._signal = None
-
-#     def AddSignal(self, sglName):
-#         self._signal = sglName
 
 class VarSglMaps(object):
     def __init__(self):
