@@ -21,18 +21,9 @@ def GetUnpackSglStr(sglName, sglType, dataStr, startbit, length, factor, offset)
     return reStr
 
 def CalcSglValue(dataStr, startbit, length):
-    # sByte = startbit / 8
-    # sBit  = startbit % 8
 
     CalcEff = (1, 3, 7, 15, 31, 63, 127, 255)
-
-    # print '    tempValue =',
-    # if sBit + length <= 8:
-    #     print '((%s[%d] & %d) >> %d);'%(dataStr, sByte, CalcEff[sBit + length - 1], sBit)
-    # else:
-    #     print '    tempValue = tempValue + %d * ',
-    #     CalcSglValue(dataStr, startbit - sBit + 8, sBit + length - 8)
-
+    
     if (startbit % 8) + length > 8:
         HiBit  = startbit + length
         HiByte = HiBit / 8

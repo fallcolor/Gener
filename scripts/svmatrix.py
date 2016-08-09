@@ -1,9 +1,11 @@
 #! python2
 
 class SglValMap(object):
-    def __init__(self, signal, value, datatype):
+    def __init__(self, signal, value, datatype, info2 = '', info1 = ''):
         self._signal = signal
         self._value  = value
+        self._info1  = info1
+        self._info2  = info2
         if datatype:
             self._type = datatype
         else:

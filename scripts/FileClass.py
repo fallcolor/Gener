@@ -117,12 +117,8 @@ class SourceFile(object):
         tmpstr += '\n'.join(self._fileinclude.GetList()) + '\n\n'
         # functions
         for func in self._funclist:
-<<<<<<< HEAD
-            tmpstr += '\n'.join(func.GetStr(self._indentationNum)) + '\n\n'
-=======
             tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
-
->>>>>>> f9a19edf2751141b2379e7e153549a1e42aefab5
+            tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
         # file end
         tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr
