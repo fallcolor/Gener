@@ -15,11 +15,6 @@ import time
 commentSgl = '//'
 
 class CommentStr(object):
-    ''' class for comment
-        _strlist: one-row comment without '// ' is an element of the string list
-
-        GetStr: gain the list of comment with '// '
-    '''
     def __init__(self, commStr = None):
         self._str = commStr
     def GetStr(self):
@@ -35,7 +30,7 @@ class FileHead(object):
         self._filename = filename
         self._author = author
         self._descrip = descrip
-    def GetStr(self):
+    def GetList(self):
         tmplist = []
         tmplist.append(CommentStr('file name   :' + self._filename).GetStr())
         tmplist.append(CommentStr('author      :' + self._author).GetStr())
@@ -49,7 +44,7 @@ class FileInclud(object):
         self._comment = CommentStr('files include')
     def AddProperty(self, filelist):
         self._filelist = filelist
-    def GetStr(self):
+    def GetList(self):
         tmplist = []
         tmplist.append(self._comment.GetStr())
         if self._filelist:
@@ -65,7 +60,7 @@ class FuncEle(object):
         self._elecomm = comm 
     def AddBody(self,bd):
         self._elebody = bd
-    def GetStr(self, inden = 4):
+    def GetList(self, inden = 4):
         tmplist = []
         for li in self._elecomm:
             tmplist.append(' ' * inden + '// ' + li)
@@ -87,7 +82,7 @@ class FuncBody(object):
         self._para = Arg
     def AddFuncEle(self, ele):
         self._eles.append(ele)
-    def GetStr(self, inden = 4):
+    def GetList(self, inden = 4):
         tmplist = []
         # function comment
         tmplist.append(self._comment)
@@ -96,7 +91,7 @@ class FuncBody(object):
         tmplist.append('{')
         # function elements
         for li in self._eles:
-            tmplist.extend(li.GetStr(inden))
+            tmplist.extend(li.GetList(inden))
         tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
         # function end
         tmplist.append('}')
@@ -117,12 +112,17 @@ class SourceFile(object):
     def GetStr(self):
         tmpstr = ''
         # file head
-        tmpstr += '\n'.join(self._filehead.GetStr()) + '\n\n'
+        tmpstr += '\n'.join(self._filehead.GetList()) + '\n\n'
         # file include
-        tmpstr += '\n'.join(self._fileinclude.GetStr()) + '\n\n'
+        tmpstr += '\n'.join(self._fileinclude.GetList()) + '\n\n'
         # functions
         for func in self._funclist:
+<<<<<<< HEAD
             tmpstr += '\n'.join(func.GetStr(self._indentationNum)) + '\n\n'
+=======
+            tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
+
+>>>>>>> f9a19edf2751141b2379e7e153549a1e42aefab5
         # file end
         tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr
