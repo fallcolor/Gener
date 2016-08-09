@@ -243,10 +243,13 @@ class VarSglMaps(object):
                 self.WriteSvFile(relist, tmpfile)
                 self.ImportSv(tmpfile)
                 self._code = gc.GenerateCode(self._dbc, self._svm)
-                print self._code
+                self._code
                 try:
-                    fi = open('e:/ks.c', 'w')
-                    fi.write(GenerateCode(db, sv))
+                    print tmpfile
+                    tmpfile = tmpfile[:-2] + 'c'
+                    print tmpfile
+                    fi = open(tmpfile, 'w')
+                    fi.write(self._code)
                     fi.close()
                     print 'success for generated!'
                 except:

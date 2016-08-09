@@ -2,7 +2,7 @@
     "Bat.BusVolt": "float",
     "Bat.BusCurr": "float",
     "Bat.SOC": "float",
+    "Tm.TmMode": "uint8_T",
     "Tm.TmTrq": "float",
-    "Tm.TmSpd": "float",
-    "Tm.TmVolt": "float"
+    "Tm.TmSpd": "float"
 }
