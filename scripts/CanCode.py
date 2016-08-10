@@ -37,23 +37,20 @@ def PackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):
         if (_startbit % 8) + _length > 8:
             curLen = 8 - (_startbit % 8)
             x1 = _startbit / 8
-            # if length == 8 and (_startbit % 8) == 0:
-            #     x2 = ''
-            # else:
-            #     x2 = GetPackBitField(startbit, curLen)
-            x2 = GetUnpackBitField(packedlen, curLen)
+            x2 = GetPackBitField(packedlen, (curLen + packedlen))
             x3 = packedlen
-            x4 = _startbit % 8            
+            x4 = _startbit % 8
             tmpstr += GetPackStr(dataStr, x1, x2, x3, x4)
             _startbit += curLen
             _length -= curLen
             packedlen += curLen
         else:
             x1 = _startbit / 8
-            if length == 8 and (_startbit % 8) == 0:
+            if length == 8 and (startbit % 8) == 0:
                 x2 = ''
             else:
-                x2 = GetPackBitField(packedlen, _length)
+                x2 = GetPackBitField(packedlen, length)
+            # print x2
             x3 = packedlen
             x4 = _startbit % 8   
             tmpstr += GetPackStr(dataStr, x1, x2, x3, x4)
@@ -70,7 +67,7 @@ def GetPackStr(dataStr, x1, x2, x3, x4):
         restr = '(' + restr + ') >> %d' % x3
     if x4 != 0:
         restr = '(' + restr + ') << %d' % x4
-    restr = 'data[%d] = ' % x1 + restr + ';'
+    restr = 'data[%d] += ' % x1 + restr + ';'
     return restr
 
 def GetPackBitField(packedlen, length):
@@ -150,10 +147,11 @@ def test():
     # print UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)
     # print GetSignalComm('bat', 20, 16, 0.1, -40)
     # print PackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)
+    print GetPackBitField(8, 16)
     print PackSignal('bat', 'int', 'data', 0, 8, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 0, 16, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 9, 1, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 4, 2, 0.1, -40)
+    print PackSignal('bat', 'int', 'data', 0, 22, 0.1, -40)
+    print PackSignal('bat', 'int', 'data', 8, 16, 0.1, -40)
+    print PackSignal('bat', 'int', 'data', 5, 2, 0.1, -40)
     print PackSignal('bat', 'int', 'data', 4, 8, 0.1, -40)
 
 if __name__ == '__main__':
