@@ -12,8 +12,6 @@ import json
 import scripts.ImportData as imdata
 import scripts.generatecode as gc 
 
-# tkMessageBox.showinfo("Python command","人生苦短、我用Python")
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 

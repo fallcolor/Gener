@@ -124,6 +124,7 @@ class SourceFile(object):
         return tmpstr
 
 def test():
+    import CanCode as cc
     sf = SourceFile()
     sf.AddFilehead('main.c','pk','ok')
     sf.AddFileInclude(['stdio.h', 'math.h'])
@@ -141,7 +142,7 @@ def test():
     f2.AddFuncName('unpack0x1313FF01')
     f2.AddFuncPara('char* data, int num')
     f2.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
-    f2.AddFuncEle(FuncEle(['signalname', 'startbit','leng'], ['busvolt = data[0];']))
+    f2.AddFuncEle(FuncEle(cc.GetSignalComm('bat', 20, 16, 0.1, -40), cc.UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)))
     sf.AddFunc(f2)
 
     print sf.GetStr()
