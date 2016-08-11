@@ -28,6 +28,14 @@ def StartGui():
 
     vrms = VarSglMaps()
 
+    nb = ttk.Notebook(root)
+    msgFrame = Frame(nb)
+    sglFrame = Frame(nb)
+    nb.add(msgFrame, text = '报文配置')
+    nb.add(sglFrame, text = '信号映射')
+    # msgFrame.pack()
+    # sglFrame.pack()
+
     inacfg = FileDeal(root, cbfunc = vrms.ImportData, inText = 'input acfg')
     inacfg.ConfigOpen('configuration for application', '.acfg', 'Open acfg')
     inacfg.pack()
@@ -43,6 +51,7 @@ def StartGui():
     geneBtn = Button(root, text = "generate code", command = vrms.GenerateCode)
     geneBtn.pack()
 
+    nb.pack(fill = BOTH, expand = 1)
     root.mainloop()
 
 class FileDeal(object):
@@ -165,7 +174,7 @@ class VarSglMaps(object):
         varNum = 0
         for vs in data:
             varNum += 1
-            sm = SignalMap(root, varNum, data[vs], vs)
+            sm = SignalMap(sglFrame, varNum, data[vs], vs)
             self._mapList.append(sm)
             sm.pack()
 
