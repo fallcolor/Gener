@@ -11,6 +11,7 @@ import ttk
 import json
 import scripts.ImportData as imdata
 import scripts.generatecode as gc 
+import scripts.GeneCanCode as gcc
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -226,8 +227,9 @@ class VarSglMaps(object):
                 # print svfile
                 self.WriteSvFile(relist, tmpfile)
                 self.ImportSv(tmpfile)
-                self._code = gc.GenerateCode(self._dbc, self._svm)
-                self._code
+                # self._code = gc.GenerateCode(self._dbc, self._svm)
+                self._code = gcc.GenerateCanCode(self._dbc, self._svm, ['VCU'])
+                print self._code
                 try:
                     print tmpfile
                     tmpfile = tmpfile[:-2] + 'c'

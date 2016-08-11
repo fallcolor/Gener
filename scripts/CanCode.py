@@ -4,6 +4,11 @@ CanCode.py
 
 pack and unpack can signal
 
+interface function, they all return a list:
+    GetSignalComm()
+    PackSignal()
+    UnpackSignal()
+
 '''
 
 from math import pow
@@ -22,7 +27,7 @@ def PackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):
     '''
     _length = length
     _startbit = startbit
-    relist = ['uint32_T tmpValue = (uint32_T)((%s - %s) / %s);' % (sglName, offset, factor)]
+    relist = ['tmpValue = (uint32_T)((%s - %s) / %s);' % (sglName, offset, factor)]
     if startbit + length > 64:
         return ['// Error: length of signal out of range']
 
@@ -85,41 +90,48 @@ def UnpackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):
     if startbit + length > 64:
         return ['// Error: length of signal out of range']
 
-    # string like  (data['x1'] & 'x2') * 'x3'
+    # string like  ((data[x1] & 'x2') >> x3) * x4
     x1 = 0
     x2 = '0xFF'
-    x3 = 1  
+    x3 = 0
+    x4 = 1  
     while _length > 0:    
         tmpstr = ''
         if (_startbit % 8) + _length > 8:
             curLen = 8 - (_startbit % 8)
             x1 = _startbit / 8
             x2 = GetUnpackBitField(_startbit % 8, curLen)
-            tmpstr += GetUnpackStr(dataStr, x1, x2, x3)
+            x3 = _startbit % 8
+            tmpstr += GetUnpackStr(dataStr, x1, x2, x3, x4)
             _startbit += curLen
             _length -= curLen
-            x3 *= pow(2, curLen)
+            x4 *= pow(2, curLen)
         else:
             x1 = _startbit / 8
             x2 = GetUnpackBitField(_startbit % 8, _length)
-            tmpstr += GetUnpackStr(dataStr, x1, x2, x3)
+            x3 = _startbit % 8
+            tmpstr += GetUnpackStr(dataStr, x1, x2, x3, x4)
             _length = 0
         tmpstr = 'tmpValue += ' + tmpstr + ';'
         relist.append(tmpstr)
     relist.append('%s = (%s)tempValue * %s + %s;' % (sglName, sglType, factor, offset))
     return relist
 
-def GetUnpackStr(dataStr, x1, x2, x3):
-    # string like  (dataStr['x1'] & 'x2') * 'x3'
+def GetUnpackStr(dataStr, x1, x2, x3, x4):
+    # string like  ((data[x1] & 'x2') >> x3) * x4
     restr = ''
     restr = '%s[%d]' % (dataStr, x1)
     if x2 != '0xFF':
         restr = restr + ' & %s' % x2
-        if x3 != 1:
-            restr = '(' + restr +') * %d' % x3
+        if x3 != 0:
+            restr = '(' + restr +') >> %d' % x3
+        if x4 != 1:
+            restr = '(' + restr +') * %d' % x4
     else:
-        if x3 != 1:
-            restr = restr +' * %d' % x3
+        if x3 != 0:
+            restr = '(' + restr +') >> %d' % x3
+        if x4 != 1:
+            restr = restr +' * %d' % x4
     return restr
 
 def GetUnpackBitField(startbit, length):
@@ -141,18 +153,17 @@ def GetUnpackBitField(startbit, length):
 
 
 def test():
-    # print UnpackSignal('bat', 'int', 'data', 0, 8, 0.1, -40)
-    # print UnpackSignal('bat', 'int', 'data', 2, 1, 0.1, -40)
-    # print UnpackSignal('bat', 'int', 'data', 12, 3, 0.1, -40)
-    # print UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)
-    # print GetSignalComm('bat', 20, 16, 0.1, -40)
+    print UnpackSignal('bat', 'int', 'data', 0, 8, 0.1, -40)
+    print UnpackSignal('bat', 'int', 'data', 2, 1, 0.1, -40)
+    print UnpackSignal('bat', 'int', 'data', 12, 3, 0.1, -40)
+    print UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)
     # print PackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)
-    print GetPackBitField(8, 16)
-    print PackSignal('bat', 'int', 'data', 0, 8, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 0, 22, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 8, 16, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 5, 2, 0.1, -40)
-    print PackSignal('bat', 'int', 'data', 4, 8, 0.1, -40)
+    # print GetPackBitField(8, 16)
+    # print PackSignal('bat', 'int', 'data', 0, 8, 0.1, -40)
+    # print PackSignal('bat', 'int', 'data', 0, 22, 0.1, -40)
+    # print PackSignal('bat', 'int', 'data', 8, 16, 0.1, -40)
+    # print PackSignal('bat', 'int', 'data', 5, 2, 0.1, -40)
+    # print PackSignal('bat', 'int', 'data', 4, 8, 0.1, -40)
 
 if __name__ == '__main__':
     test()

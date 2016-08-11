@@ -29,3 +29,9 @@ class SvMatrix(object):
             if signal == sv._signal:
                 return True, sv._value, sv._type
         return False, None, None
+    def GetSignals(self, signal):
+        relist = []
+        for sv in self._list:
+            if signal == sv._signal:
+                relist.append([sv._value, sv._type])
+        return relist

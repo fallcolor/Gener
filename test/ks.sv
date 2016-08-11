@@ -1,4 +1,5 @@
 TM_InvTemp, TM.InvTemp, int16_T
+TM_InvTemp, TM.InvTemp1, int16_T
 BAT_Volt, Bat.BusVolt, float
 TM_EnergyActl, TM.EneAct
 VCU_SpdSet, Set.vehSpd, float

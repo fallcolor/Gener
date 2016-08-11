@@ -4,5 +4,7 @@
     "Bat.SOC": "float",
     "Tm.TmMode": "uint8_T",
     "Tm.TmTrq": "float",
-    "Tm.TmSpd": "float"
+    "Tm.TmSpd": "float",
+    "Set.TmTrq": "float",
+    "Set.BrkSwh": "float"
 }

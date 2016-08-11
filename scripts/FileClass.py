@@ -118,7 +118,6 @@ class SourceFile(object):
         # functions
         for func in self._funclist:
             tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
-            tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
         # file end
         tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr
@@ -144,7 +143,7 @@ def test():
     f2.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
     f2.AddFuncEle(FuncEle(cc.GetSignalComm('bat', 20, 16, 0.1, -40), cc.UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)))
     sf.AddFunc(f2)
-
+    print len(sf._funclist)
     print sf.GetStr()
 
 if __name__ == '__main__':
