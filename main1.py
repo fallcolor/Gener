@@ -78,13 +78,14 @@ class FileDeal(object):
     def OpenOrSaveFile(self):
         if self._fileOption.has_key('title'):
             f = tkFileDialog.askopenfile(mode = 'r', **self._fileOption)
-
+            print 'call back'
             if f:
                 self._label['text'] = f.name
                 if self._callbackFunc == None:
                     print 'no binding callback function'
                 else:
                     self._callbackFunc(f.name)
+                    
             else:
                 print 'Open dbc file failed'
         else:

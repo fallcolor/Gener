@@ -1,5 +1,5 @@
 {
-    "version": 0.1,
+    "version": 0.121,
     "project": "test",
     "var": [
         ["Bat.BusVolt", "float"],

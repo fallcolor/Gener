@@ -7,13 +7,24 @@
 '''
 import json
 
+'''
+>>> mylist = [1,2,2,2,2,3,3,3,4,4,4,4]
+>>> myset = set(mylist)
+>>> for item in myset:
+         print("the %d has found %d" %(item,mylist.count(item)))
+ 
+the 1 has found 1
+the 2 has found 4
+the 3 has found 3
+the 4 has found 4
+'''
+
 class AppConfig(object):
     '''
     contain app configuration, with following attributes:
         _version
         _prj: project name
         _var: a list of variable, like [["Bat.BusVolt": "float"],["Bat.BusVolt": "float"]]
-    ]
     '''
     def __init__(self, ver = '0.1', prj = ''):
         self._version = ver
@@ -80,6 +91,33 @@ class MapConfig(object):
         self._cancfg = {}
         self._msgcfgs = []
         self._maps = []
+        self._displayfunc = EmptyFunc
+
+    def AddVariables(self, ac):
+        self._appver = ac._version
+        self._prj = ac._prj
+        cnt = 1
+        for var in ac._vars:
+            self._maps.append(SignalMap(cnt, var))
+            cnt += 1
+        self._displayfunc()
+
+    def AddVarsFrmoFile(self, infile):
+        '''
+        tbc: ChangeVariables
+        '''
+        ac = AppConfig()
+        ac.ImportFromFile(infile)
+        self.AddVariables(ac)
+        printmc(self)
+
+    def ChangeVariables(self, ac):
+        # [i for i in li]
+        return True
+
+    def ChangeHwConfig(self, hc):
+
+        return True
 
     def EditMap(self, num, sgl, st, tt, uniq):
         for mp in self._maps:
@@ -108,7 +146,10 @@ class MapConfig(object):
             self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
         # self._maps = data['map']
+        self._displayfunc()
 
+    def AddDisplayFunc(self, func):
+        self._displayfunc = func
 
 class MessageConfig(object):
     '''
@@ -136,9 +177,36 @@ class SignalMap(object):
         self._transtype = tt
         self._uniq = uniq
 
+def EmptyFunc():
+    pass
+
+def printmc(mc):
+    print 'App vension is %s' % mc._appver
+    print 'Hw vension is %s' % mc._hwver
+    print 'Reference ECU are : ', mc._ecu
+    print mc._cancfg
+    for mcmc in mc._msgcfgs:
+        print mcmc._ID
+        print mcmc._node
+        print mcmc._prd
+        print mcmc._tran
+        print mcmc._sglfunc
+        print mcmc._DLC
+        print mcmc._IDE
+        print mcmc._enable
+        print mcmc._checked
+    for mp in mc._maps:
+        print mp._num
+        print mp._var
+        print mp._type
+        print mp._signal
+        print mp._sgltype
+        print mp._transtype
+        print mp._uniq
+
 def test():
-    # ac = AppConfig()
-    # ac.ImportFromFile(r'E:\pyproj\gener\test\app.ac')
+    ac = AppConfig()
+    ac.ImportFromFile(r'E:\pyproj\gener\test\app.ac')
     # print ac._vars
 
     # hc = HwConfig()
@@ -150,8 +218,11 @@ def test():
     # print hc._AI
 
     mc = MapConfig()
-    mc.ImportFromFile(r'E:\pyproj\gener\test\kk.sv')
-    print mc._ecu
+    # mc.ImportFromFile(r'E:\pyproj\gener\test\kk.sv')
+    mc.AddVaribales(ac)
+    print 'App vension is %s' % mc._appver
+    print 'Hw vension is %s' % mc._hwver
+    print 'Reference ECU are : ', mc._ecu
     print mc._cancfg
     for mcmc in mc._msgcfgs:
         print mcmc._ID
