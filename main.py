@@ -1,11 +1,14 @@
 import sys
 import time
 
-
+# griphic interface
 from Tkinter import *
 import tkMessageBox
 import tkFileDialog
 import ttk
+
+# user module
+import scripts.ConfigClass as cc
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -22,15 +25,15 @@ def StartGui():
     nb.add(msgFrame, text = 'Basic config')
     nb.add(sglFrame, text = 'Signa. Map')
 
-    inacfg = FileDeal(root, inText = 'input acfg')
-    inacfg.ConfigOpen('configuration for application', '.acfg', 'Open acfg')
+    inacfg = FileDeal(root, inText = 'input ac file')
+    inacfg.ConfigOpen('configuration for application', '.ac', 'Open acfg')
     inacfg.pack()
 
-    inhcfg = FileDeal(root, inText = 'input hcfg')
-    inhcfg.ConfigOpen('configuration for hardware', '.hcfg', 'Open hcfg')
+    inhcfg = FileDeal(root, inText = 'input hc file')
+    inhcfg.ConfigOpen('configuration for hardware', '.hc', 'Open hcfg')
     inhcfg.pack()
 
-    indbc = FileDeal(root, inText = 'input dbc')
+    indbc = FileDeal(root, inText = 'input dbc file')
     indbc.ConfigOpen('data for can', '.dbc', 'Open dbc')
     indbc.pack()
 
