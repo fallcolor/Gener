@@ -264,7 +264,7 @@ class Frame(object):
         self._SignalGroups = []
         self._extended = 0
         self._comment = None
-        self._used = False
+        # self._used = False
 
     def addSignalGroup(self, Name, Id, signalNames):
         newGroup = SignalGroup(Name, Id)

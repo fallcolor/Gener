@@ -7,6 +7,7 @@
 '''
 import json
 import canmatrix as cm
+import re
 
 '''
 >>> mylist = [1,2,2,2,2,3,3,3,4,4,4,4]
@@ -73,9 +74,10 @@ class HwConfig(object):
 
 class CanConfig(cm.CanMatrix):
     def ImportFromFile(self, infile):
+        dbcImportEncoding='iso-8859-1'
         i = 0
 
-        f = open(filename, 'rb')
+        f = open(infile, 'rb')
         for line in f:
             i = i+1
             l = line.strip()
@@ -128,6 +130,17 @@ class CanConfig(cm.CanMatrix):
                     self._fl.addSignalToLastFrame(Signal(temp.group(1), temp.group(3), temp.group(4), temp.group(5), temp.group(6), temp.group(7),temp.group(8),temp.group(9),temp.group(10),temp_raw.group(11).decode(dbcImportEncoding),reciever, multiplex))
                 # print temp.group(1),temp.group(2),temp.group(3)
 
+            elif decoded.startswith("BU_:"):
+                pattern = "^BU\_\:(.*)"
+                regexp = re.compile(pattern)
+                regexp_raw = re.compile(pattern.encode(dbcImportEncoding))
+                temp = regexp.match(decoded)
+                if temp:
+                    myTempListe = temp.group(1).split(' ')
+                    for ele in myTempListe:
+                        if len(ele.strip()) > 1:
+                            self._BUs.add(BoardUnit(ele))
+
         for bo in self._fl._list:
             if bo._Id > 0x80000000:
                 bo._Id -= 0x80000000
@@ -163,7 +176,7 @@ class MapConfig(object):
         for var in ac._vars:
             self._maps.append(SignalMap(cnt, var))
             cnt += 1
-        self._displayfunc()
+        self._displayfunc(self)
 
     def AddVarsFrmoFile(self, infile):
         '''
@@ -172,7 +185,6 @@ class MapConfig(object):
         ac = AppConfig()
         ac.ImportFromFile(infile)
         self.AddVariables(ac)
-        printmc(self)
 
     def ChangeVariables(self, ac):
         # [i for i in li]
@@ -209,7 +221,7 @@ class MapConfig(object):
             self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
         # self._maps = data['map']
-        self._displayfunc()
+        self._displayfunc(self)
 
     def AddDisplayFunc(self, func):
         self._displayfunc = func
@@ -240,7 +252,7 @@ class SignalMap(object):
         self._transtype = tt
         self._uniq = uniq
 
-def EmptyFunc():
+def EmptyFunc(ef):
     pass
 
 def printmc(mc):
@@ -268,8 +280,8 @@ def printmc(mc):
         print mp._uniq
 
 def test():
-    ac = AppConfig()
-    ac.ImportFromFile(r'E:\pyproj\gener\test\app.ac')
+    # ac = AppConfig()
+    # ac.ImportFromFile(r'E:\pyproj\gener\test\app.ac')
     # print ac._vars
 
     # hc = HwConfig()
@@ -280,31 +292,14 @@ def test():
     # print hc._PWM
     # print hc._AI
 
-    mc = MapConfig()
+    # mc = MapConfig()
     # mc.ImportFromFile(r'E:\pyproj\gener\test\kk.sv')
-    mc.AddVaribales(ac)
-    print 'App vension is %s' % mc._appver
-    print 'Hw vension is %s' % mc._hwver
-    print 'Reference ECU are : ', mc._ecu
-    print mc._cancfg
-    for mcmc in mc._msgcfgs:
-        print mcmc._ID
-        print mcmc._node
-        print mcmc._prd
-        print mcmc._tran
-        print mcmc._sglfunc
-        print mcmc._DLC
-        print mcmc._IDE
-        print mcmc._enable
-        print mcmc._checked
-    for mp in mc._maps:
-        print mp._num
-        print mp._var
-        print mp._type
-        print mp._signal
-        print mp._sgltype
-        print mp._transtype
-        print mp._uniq
+    # mc.AddVariables(ac)
+    # printmc(mc)
+
+    cc = CanConfig()
+    cc.ImportFromFile(r'E:\pyproj\gener\test\ks.dbc')
+    print cc._BUs
 
 if __name__ == '__main__':
     test()
