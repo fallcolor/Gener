@@ -1,0 +1,10 @@
+{
+    "version": 0.121,
+    "project": "test",
+    "var": [
+        ["Bat.SOC", "float"],
+        ["Bat.SOC", "float"],
+        ["Bat.BusCurr", "float"],
+        ["Bat.BusVolt", "float"]
+    ]
+}

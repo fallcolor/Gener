@@ -44,7 +44,7 @@ def StartGui():
     inhcfg.ConfigOpen('configuration for hardware', '.hc', 'Open hcfg')
     inhcfg.pack()
 
-    indbc = uc.FileDealControl(root, inText = 'input dbc file')
+    indbc = uc.FileDealControl(root, cbfunc = mc.AddDbcFromFile, inText = 'input dbc file')
     indbc.ConfigOpen('data for can', '.dbc', 'Open dbc')
     indbc.pack()
 

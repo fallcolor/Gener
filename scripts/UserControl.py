@@ -56,7 +56,7 @@ class SignalMapControl(object):
     '''
     a control for signal mapping
     '''
-    def __init__(self, rootCom, varNum, varType, varName):
+    def __init__(self, rootCom, varNum, varType, varName, cb2value = '', cb3value = ''):
         self._lf = LabelFrame(rootCom, text = '')
         self._num = Label(self._lf, width = 5, text = varNum)
         self._type = Label(self._lf, width = 8, text = varType, anchor = 'sw')
@@ -67,8 +67,10 @@ class SignalMapControl(object):
         self._combo2 = ttk.Combobox(self._lf, width = 30)        
         self._combo2.state(['readonly'])
         self._combo2.bind('<<ComboboxSelected>>', self.cb2Select)
+        self.AddCb2Value(cb2value)
         self._combo3 = ttk.Combobox(self._lf, width = 25)
         self._combo3.state(['readonly'])
+        self.AddCb3Value(cb3value)
 
     def cb1Select(self, e = None):
         if self._combo1.get() == "CAN signal":  
@@ -90,6 +92,13 @@ class SignalMapControl(object):
     def AddCb3Value(self, vl):
         self._combo3['value'] = vl
 
+    def EditMap(self, varNum, varType, varName, cb2value = '', cb3value = ''):
+        self._num['text'] = varNum
+        self._type['text'] = varType
+        self._var['text'] = varName
+        self.AddCb2Value(cb2value)
+        self.AddCb3Value(cb3value)
+
     def GetMap(self):
         cb1str = self._combo1.get()
         cb3str = self._combo3.get()
@@ -104,6 +113,16 @@ class SignalMapControl(object):
             else:
                 return self._num['text'], self._var['text'], None, None, None
 
+    def forget(self):
+        self._lf.forget()
+        self._num.forget()
+        self._type.forget()
+        self._var.forget()
+        self._combo1.forget()
+        self._combo2.forget()
+        self._combo3.forget()
+        # self.forget()
+
     def pack(self):
         self._lf.pack(fill = X)
         self._num.pack(side = LEFT)
@@ -114,29 +133,61 @@ class SignalMapControl(object):
         self._combo3.pack(side = LEFT)
 
 class MessageConfigControl(object):
-    def __init__(self, rootCom):
-        pass
+    def __init__(self, rootCom, num, msgid, name):
+        self._lf = LabelFrame(rootCom, text = '')
+        self._chk = Checkbutton(self._lf)
+        self._num = Label(self._lf, text = num)
+        self._ID = Label(self._lf, text = msgid)
+        self._msgname = Label(self._lf, text = name)
+        self._node = ttk.Combobox(self._lf, width = 15)
+        self._prd = Text(self._lf)
+        self._enable = Checkbutton(self._lf)
+
 
 class MessageFrameControl(LabelFrame):
-    def Refresh(self, mc):
+    def __init__(self, ro, **kwArg):
+        LabelFrame.__init__(self, ro, **kwArg)
+        self._chkFrm = None
         self._ecuList = []
         self._chkVar = []
+
+    def Refresh(self, mc):
+        # self.pack_forget()
         cnt = 0
+        if self._chkFrm is None:
+            self._chkFrm = LabelFrame(self, text = 'Select Tx ECU')
+            self._chkFrm.pack(fill = X)
+
+        for ecu in self._ecuList:
+            ecu.forget()
+
         for ecu in mc._ecu:
-            self._chkVar.append(IntVar())
-            chkbtn = Checkbutton(self, text = ecu, variable = self._chkVar[cnt])
+            if cnt == len(self._ecuList):   # cnt is index, is len - 1
+                self._chkVar.append(0)
+                chkbtn = Checkbutton(self._chkFrm, text = ecu, variable = self._chkVar[cnt])           
+                self._ecuList.append(chkbtn)
+            else:
+                self._chkVar[cnt] = 0
+                self._ecuList[cnt]['text'] = ecu
+            self._ecuList[cnt].pack(side = LEFT)
             cnt += 1
-            self._ecuList.append(chkbtn)
-            chkbtn.pack()
         
 
 class SignalFrameControl(LabelFrame):
-    # def __init__(self):
-    #     self._mapList = []
-    def Refresh(self, mc):
+    def __init__(self, ro, **kwArg):
+        LabelFrame.__init__(self, ro, **kwArg)
         self._mapList = []
+    def Refresh(self, mc):
         # print 'Call SignalFrameControl.Refresh()'
+        cnt = 0
+        for vs in self._mapList:
+            vs.forget()
+
         for vs in mc._maps:
-            sm = SignalMapControl(self, vs._num, vs._type, vs._var)
-            self._mapList.append(sm)
-            sm.pack()
+            if cnt == len(self._mapList):
+                sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype)
+                self._mapList.append(sm)
+            else:
+                self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype)
+            self._mapList[cnt].pack()
+            cnt += 1

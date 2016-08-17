@@ -1,0 +1,161 @@
+VERSION "created by canmatrix"
+
+
+NS_ :
+
+BS_:
+
+BU_: VCU BMS
+
+
+BO_ 2297561248 VCU2IPK3: 7 
+ SG_ LZ_VehSpd : 40|8@1+ (1,-50) [0.0|50.0] "km/h" 
+ SG_ LZ_ChgDrvMode : 20|4@1+ (1,0) [0.0|15.0] "" 
+ SG_ LZ_DcChgCC2 : 19|1@1- (1,0) [0.0|1.0] "" 
+ SG_ LZ_AcChgCC2 : 18|1@1- (1,0) [0.0|1.0] "" 
+ SG_ LZ_ChgMode : 16|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ LZ_KeySgl : 12|4@1+ (1,0) [0.0|15.0] "" 
+ SG_ LZ_VehGear : 8|4@1+ (1,0) [0.0|15.0] "" 
+ SG_ LZ_VehMode : 0|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ LZ_AccPedalStt : 48|8@1+ (1,0) [0.0|255.0] "%" 
+ SG_ AdSignal : 24|16@1+ (1,0) [0.0|65535.0] "" 
+
+BO_ 2147488616 DCDC_Failure: 7 
+ SG_ DCDC_ErrStt2 : 55|8@0+ (1,0) [0.0|255.0] "" 
+ SG_ DCDC_ErrStt1 : 47|8@0+ (1,0) [0.0|255.0] "" 
+ SG_ DCDC_SWVersion : 31|16@0+ (1,0) [0.0|65535.0] "" 
+ SG_ DCDC_ID : 15|16@0+ (1,0) [0.0|65535.0] "" 
+ SG_ DC_FailSt_Inverted : 7|2@0+ (1,0) [0.0|3.0] "" 
+ SG_ DC_FailSt : 5|2@0+ (1,0) [0.0|3.0] "" 
+ SG_ DCDC_Failure_ctRoll : 3|4@0+ (1,0) [0.0|15.0] "" 
+
+BO_ 2147488641 DCDC_Limits: 5 
+ SG_ DCDC_Limits_ctRoll : 35|4@0+ (1,0) [0.0|15.0] "" 
+ SG_ DC_ActTemp : 31|8@0+ (1,-40) [0.0|40.0] "degC" 
+ SG_ DC_udcLvActSetP : 8|9@0+ (0.125,0) [0.0|63.875] "V" 
+ SG_ DC02_bDernUndrUdcHv : 15|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernOvrIdcHv : 14|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernOvrUdcLv : 7|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernOvrIdcLv : 6|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bErrShtOff : 5|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernUndrUdcLv : 4|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bErrVltg : 3|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernOvrUdcHv : 2|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bDernTemp : 1|1@0- (1,0) [0.0|1.0] "" 
+ SG_ DC02_bErrLimitedPerformance : 0|1@0- (1,0) [0.0|1.0] "" 
+
+BO_ 2147488633 DCDC_General: 8 
+ SG_ DC_ActCurAtHV : 35|12@0+ (0.125,0) [0.0|511.875] "A" 
+ SG_ DC_ActCurAtLV : 31|11@0+ (1,0) [0.0|2047.0] "A" 
+ SG_ DC_ActLowVolt : 8|9@0+ (0.125,0) [0.0|63.875] "V" 
+ SG_ DC_ActHighVolt : 3|10@0+ (2,0) [0.0|2046.0] "V" 
+ SG_ DCDC_General_ctRoll : 7|4@0+ (1,0) [0.0|14.0] "" 
+ SG_ DC_StMode : 50|3@0+ (1,0) [0.0|7.0] "" 
+
+BO_ 2147488424 IPU_DCDC_Ctrl: 5 
+ SG_ HCU_SystemFailureMode : 24|4@1+ (1,0) [0.0|15.0] "" 
+ SG_ idcLvSetP : 31|9@1+ (0.5,0) [0.0|255.5] "A" 
+ SG_ IPU_DCDC_Ctrl_ctRoll : 4|4@1+ (1,0) [0.0|15.0] "" 
+ SG_ StModeReq : 0|3@1+ (1,0) [0.0|7.0] "" 
+ SG_ udcLvSetP : 8|8@1+ (0.125,0) [0.0|31.875] "V" 
+
+BO_ 2355876304 VCU_TM: 7 VCU
+ SG_ VCU_SpdSet : 40|16@1+ (1,0) [0.0|7000.0] "rpm" 
+ SG_ VCU_MtrCtrlMode : 34|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ VCU_BrpSwh : 32|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ VCU_AccSgl : 24|8@1+ (1,0) [0.0|100.0] "%" 
+ SG_ VCU_TrqSet : 8|16@1+ (1,-1000) [0.0|2000.0] "Nm" 
+ SG_ VCU_TMEnable : 4|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ VCU_TMSttCmd : 0|4@1+ (1,0) [0.0|15.0] "" 
+
+BO_ 2355810513 TM_State3: 8 TM
+ SG_ TM_InvTemp : 48|16@1+ (1,-40) [0.0|250.0] "degC" 
+ SG_ TM_MtrTemp : 32|16@1+ (1,-40) [0.0|250.0] "degC" 
+ SG_ TM_EnergyActl : 16|16@1+ (0.01,-300) [0.0|600.0] "kWh" 
+ SG_ TM_PowerActl : 0|16@1+ (0.01,-300) [0.0|600.0] "kW" 
+
+BO_ 2355744977 TM_State2: 6 TM
+ SG_ TM_CurrActl : 32|16@1+ (1,-500) [0.0|1000.0] "A" 
+ SG_ TM_Efficency : 16|8@1+ (1,0) [0.0|100.0] "%" 
+ SG_ TM_Volt_C : 0|16@1+ (1,0) [0.0|980.0] "V" 
+
+BO_ 2355679441 TM_State1: 8 TM
+ SG_ TM_WarnStt : 56|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ TM_TrqMax : 40|16@1+ (1,-1000) [0.0|2000.0] "Nm" 
+ SG_ TM_SpdActl : 24|16@1- (1,0) [0.0|7000.0] "rpm" 
+ SG_ TM_TrqActl : 8|16@1+ (1,-1000) [0.0|2000.0] "Nm" 
+ SG_ TM_CtrlMode : 4|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ TM_Stt : 0|4@1+ (1,0) [0.0|15.0] "" 
+
+BO_ 2356662992 VCU_HVEnable: 8 VCU
+ SG_ VCU_HVEnable : 56|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ VCU_TMVolt : 0|16@1+ (1,0) [0.0|980.0] "" 
+
+BO_ 2557923538 BMS_Limit2: 8 BMS
+ SG_ BAT_MinDisChgVolt : 48|16@1+ (0.015,0) [0.0|979.995] "V" 
+ SG_ BAT_MaxChgVolt : 32|16@1+ (0.015,0) [0.0|979.995] "V" 
+ SG_ BAT_MaxDisChgCurr : 16|16@1+ (0.05,0) [0.0|500.0] "A" 
+ SG_ BAT_MaxChgCurr : 0|16@1+ (0.05,0) [0.0|500.0] "A" 
+
+BO_ 2557858002 BMS_Limit1: 8 BMS
+ SG_ BAT_MinCellTempLimt : 56|8@1- (1,-40) [-128.0|40.0] "degC" 
+ SG_ BAT_MaxCellTempLimt : 48|8@1+ (1,-40) [0.0|40.0] "degC" 
+ SG_ BAT_MinSOCLimt : 40|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_MaxSOCLimt : 32|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_MinCellVoltLimt : 16|16@1+ (0.001,0) [0.0|5.0] "V" 
+ SG_ BAT_MaxCellVoltLimt : 0|16@1+ (0.001,0) [0.0|5.0] "V" 
+
+BO_ 2557792466 BMS_CellTemperature: 8 BMS
+ SG_ BAT_MinTempBoxNo : 56|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MinTempCellNo : 48|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MinCellTemp : 32|16@1+ (1,-40) [0.0|250.0] "degC" 
+ SG_ BAT_MaxTempBoxNo : 24|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MaxTempCellNo : 16|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MaxCellTemp : 0|16@1+ (1,-40) [0.0|250.0] "degC" 
+
+BO_ 2557726930 BMS_CellVoltage: 8 BMS
+ SG_ BAT_MinVoltBoxNo : 56|5@1- (1,0) [0.0|15.0] "" 
+ SG_ BAT_MinVoltCellNo : 48|5@1- (1,0) [0.0|15.0] "" 
+ SG_ BAT_MinCellVolt : 32|16@1+ (0.001,0) [0.0|5.0] "V" 
+ SG_ BAT_MaxVoltBoxNo : 24|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MaxVoltCellNo : 16|5@1+ (1,0) [0.0|31.0] "" 
+ SG_ BAT_MaxCellVolt : 0|16@1+ (0.001,0) [0.0|5.0] "V" 
+
+BO_ 2356334802 BMS_State: 8 BMS
+ SG_ BAT_Stt : 0|2@1+ (1,0) [0.0|3.0] "" 
+ SG_ BAT_MaxPoleTemp : 8|16@1+ (1,-40) [0.0|250.0] "degC" 
+ SG_ BAT_Err3 : 56|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ BAT_Err2 : 48|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ BAT_Err1 : 40|8@1+ (1,0) [0.0|255.0] "" 
+ SG_ BAT_BoxStt : 24|16@1+ (1,0) [0.0|65535.0] "" 
+
+BO_ 2356269266 BMS_Voltage: 8 BMS
+ SG_ BAT_Volt : 0|16@1+ (0.015,0) [0.0|979.995] "V" 
+ SG_ BAT_SOH : 40|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_SOC : 32|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_Curr : 16|16@1+ (0.05,-500) [0.0|1000.0] "A" 
+ SG_ BAT_AvgCellVolt : 48|16@1+ (0.001,0) [0.0|5.0] "V" 
+
+
+
+
+
+BA_DEF_ BU_ "CANoeDrift" INT 0 0;
+BA_DEF_ BU_ "CANoeJitterMax" INT 0 0;
+BA_DEF_ BU_ "CANoeJitterMin" INT 0 0;
+BA_DEF_ BU_ "CANoeStartDelay" INT 0 0;
+BA_DEF_ BU_ "ECU" STRING;
+BA_DEF_ BU_ "NodeLayerModules" STRING;
+BA_DEF_ "BusType" STRING;
+BA_DEF_DEF_ "BusType" "";
+BA_DEF_DEF_ "CANoeDrift" 0;
+BA_DEF_DEF_ "CANoeJitterMax" 0;
+BA_DEF_DEF_ "CANoeJitterMin" 0;
+BA_DEF_DEF_ "CANoeStartDelay" 0;
+BA_DEF_DEF_ "ECU" "";
+BA_DEF_DEF_ "NodeLayerModules" "";
+
+
+
+
+VAL_ 2356269266 BAT_AvgCellVolt 0 "电池断开" 1 "辅助接触器闭合，预充电" 2 "主接触器闭合，正常工作" 3 "充电枪已接入，且充电机上电";

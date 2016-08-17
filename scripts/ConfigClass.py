@@ -93,22 +93,22 @@ class CanConfig(cm.CanMatrix):
                 temp = regexp.match(decoded)
                 #db._fl.addFrame(Frame(temp.group(1), temp.group(2), temp.group(3), temp.group(4)))
                 if temp:
-                    self._fl.addFrame(Frame(temp.group(1), temp.group(2), temp.group(3), temp.group(4)))
+                    self._fl.addFrame(cm.Frame(temp.group(1), temp.group(2), temp.group(3), temp.group(4)))
                 else:
                     regexp = re.compile("^BO\_ (\w+) (\w+) *: (\w+)")
                     temp = regexp.match(decoded)
-                    self._fl.addFrame(Frame(temp.group(1), temp.group(2), temp.group(3), None))
+                    self._fl.addFrame(cm.Frame(temp.group(1), temp.group(2), temp.group(3), None))
                 # print temp.group(1), temp.group(2),temp.group(3)
             elif decoded.startswith("SG_ "):
                 pattern = "^SG\_ (\w+) : (\d+)\|(\d+)@(\d+)([\+|\-]) \(([0-9.+\-eE]+),([0-9.+\-eE]+)\) \[([0-9.+\-eE]+)\|([0-9.+\-eE]+)\] \"(.*)\""
                 regexp = re.compile(pattern)
                 temp = regexp.match(decoded)
-                regexp_raw = re.compile(pattern.encode(selfcImportEncoding))
+                regexp_raw = re.compile(pattern.encode(dbcImportEncoding))
                 temp_raw = regexp_raw.match(l)
                 if temp:
                     #reciever = list(map(str.strip, temp.group(11).split(',')))
                     reciever = None
-                    tempSig = Signal(temp.group(1), temp.group(2), temp.group(3), temp.group(4), temp.group(5), temp.group(6), temp.group(7),temp.group(8),temp.group(9),temp_raw.group(10).decode(dbcImportEncoding),reciever)     
+                    tempSig = cm.Signal(temp.group(1), temp.group(2), temp.group(3), temp.group(4), temp.group(5), temp.group(6), temp.group(7),temp.group(8),temp.group(9),temp_raw.group(10).decode(dbcImportEncoding),reciever)     
                     if tempSig._byteorder == 0:
                         # startbit of motorola coded signals are MSB in dbc
                         tempSig.setMsbStartbit(int(temp.group(2)))                
@@ -127,7 +127,7 @@ class CanConfig(cm.CanMatrix):
                     else:
                         multiplex = int(multiplex[1:])
 
-                    self._fl.addSignalToLastFrame(Signal(temp.group(1), temp.group(3), temp.group(4), temp.group(5), temp.group(6), temp.group(7),temp.group(8),temp.group(9),temp.group(10),temp_raw.group(11).decode(dbcImportEncoding),reciever, multiplex))
+                    self._fl.addSignalToLastFrame(cm.Signal(temp.group(1), temp.group(3), temp.group(4), temp.group(5), temp.group(6), temp.group(7),temp.group(8),temp.group(9),temp.group(10),temp_raw.group(11).decode(dbcImportEncoding),reciever, multiplex))
                 # print temp.group(1),temp.group(2),temp.group(3)
 
             elif decoded.startswith("BU_:"):
@@ -139,7 +139,7 @@ class CanConfig(cm.CanMatrix):
                     myTempListe = temp.group(1).split(' ')
                     for ele in myTempListe:
                         if len(ele.strip()) > 1:
-                            self._BUs.add(BoardUnit(ele))
+                            self._BUs.add(cm.BoardUnit(ele))
 
         for bo in self._fl._list:
             if bo._Id > 0x80000000:
@@ -169,9 +169,11 @@ class MapConfig(object):
         self._maps = []
         self._displayfunc = EmptyFunc
 
+    # import data from app config
     def AddVariables(self, ac):
         self._appver = ac._version
         self._prj = ac._prj
+        # self._maps = []
         cnt = 1
         for var in ac._vars:
             self._maps.append(SignalMap(cnt, var))
@@ -190,10 +192,24 @@ class MapConfig(object):
         # [i for i in li]
         return True
 
+    # import data from hardware
     def ChangeHwConfig(self, hc):
 
         return True
 
+    # import data from dbc
+    def AddDbcFromFile(self, infile):
+        cc = CanConfig()
+        cc.ImportFromFile(infile)
+        self.AddDbc(cc)
+
+    def AddDbc(self, cc):
+        self._ecu = {}
+        for ecu in cc._BUs._list:
+            self._ecu[ecu._name] = False
+        self._displayfunc(self)
+
+    # map of signal and variable
     def EditMap(self, num, sgl, st, tt, uniq):
         for mp in self._maps:
             if mp._num == num:
@@ -229,7 +245,7 @@ class MapConfig(object):
 class MessageConfig(object):
     '''
     '''
-    def __init__(self, msgid = '', nd = 0, prd = 100, tran = True, sf = '', dlc = 8, ide = True, en = True, chked = True):
+    def __init__(self, msgid = '', nd = 0, prd = 100, tran = True, sf = '', dlc = 8, ide = True, en = True, chked = False):
         self._ID = msgid
         self._node = nd
         self._prd = prd
@@ -248,8 +264,8 @@ class SignalMap(object):
         self._var = var[0]
         self._type = var[1]
         self._signal = sgl
-        self._sgltype = st
-        self._transtype = tt
+        self._sgltype = st      # msg name or DI\DO\PWM
+        self._transtype = tt    # can or hw IO
         self._uniq = uniq
 
 def EmptyFunc(ef):
