@@ -134,14 +134,62 @@ class SignalMapControl(object):
 
 class MessageConfigControl(object):
     def __init__(self, rootCom, num, msgid, name):
+        self._chkVar = IntVar()
+        self._chkEnable = IntVar()
+        self._prdVar = StringVar()
+        self._DLCVar = StringVar()
         self._lf = LabelFrame(rootCom, text = '')
-        self._chk = Checkbutton(self._lf)
+        self._chk = Checkbutton(self._lf, variable = self._chkVar)
         self._num = Label(self._lf, text = num)
-        self._ID = Label(self._lf, text = msgid)
+        self._Id = Label(self._lf, text = msgid)
         self._msgname = Label(self._lf, text = name)
         self._node = ttk.Combobox(self._lf, width = 15)
-        self._prd = Text(self._lf)
-        self._enable = Checkbutton(self._lf)
+        self._prd = Entry(self._lf, textvariable = self._prdVar)
+        self._prd.insert(0, '100')
+        self._DLC = Entry(self._lf, textvariable = self._DLCVar)
+        self._DLC.insert(0, '8')
+        self._enable = Checkbutton(self._lf, variable = self._chkEnable, text = 'Enable')
+
+    def GetValue(self):
+        return self._Id['text'], self._prd.get(), self._DLC.get(), self._chkEnable.get(), self._chkVar.get()
+
+    def ChangeValue(self, num, msgid, name, node, prd, dlc, en, chk):
+        self._num['text'] = num
+        self._Id['text'] = msgid
+        self._msgname['text'] = name
+        self._node.set(node)
+        self._prdVar.set(prd)
+        self._DLCVar.set(dlc)
+        if en == 1:
+            self._enable.select()
+        else:
+            self._enable.deselect()
+        if chk == 1:
+            self._chk.select()
+        else:
+            self._chk.deselect()
+
+    def forget(self):
+        self._lf.forget()
+        self._chk.forget()
+        self._num.forget()
+        self._Id.forget()
+        self._msgname.forget()
+        self._node.forget()
+        self._prd.forget()
+        self._DLC.forget()
+        self._enable.forget()
+
+    def pack(self):
+        self._lf.pack(fill = X)
+        self._chk.pack(side = LEFT)
+        self._num.pack(side = LEFT)
+        self._Id.pack(side = LEFT)
+        self._msgname.pack(side = LEFT)
+        self._node.pack(side = LEFT)
+        self._prd.pack(side = LEFT)
+        self._DLC.pack(side = LEFT)
+        self._enable.pack(side = LEFT)
 
 
 class MessageFrameControl(LabelFrame):
@@ -150,9 +198,10 @@ class MessageFrameControl(LabelFrame):
         self._chkFrm = None
         self._ecuList = []
         self._chkVar = []
+        self._mcList = []
 
     def Refresh(self, mc):
-        # self.pack_forget()
+        # check button
         cnt = 0
         if self._chkFrm is None:
             self._chkFrm = LabelFrame(self, text = 'Select Tx ECU')
@@ -163,15 +212,31 @@ class MessageFrameControl(LabelFrame):
 
         for ecu in mc._ecu:
             if cnt == len(self._ecuList):   # cnt is index, is len - 1
-                self._chkVar.append(0)
-                chkbtn = Checkbutton(self._chkFrm, text = ecu, variable = self._chkVar[cnt])           
+                self._chkVar.append(IntVar())
+                chkbtn = Checkbutton(self._chkFrm, text = ecu, variable = self._chkVar[cnt])
+                # chkbtn = Checkbutton(self._chkFrm, text = ecu)           
                 self._ecuList.append(chkbtn)
             else:
-                self._chkVar[cnt] = 0
+                # self._chkVar.append(IntVar())
                 self._ecuList[cnt]['text'] = ecu
             self._ecuList[cnt].pack(side = LEFT)
             cnt += 1
-        
+
+        # message config
+        # mcc = MessageConfigControl(self, 10, 'sdf', 'sdfsdfsdf')
+        # self._mcList.append(mcc)
+        # self._mcList[0].pack()
+        # self._mcList[0].ChangeValue(1, 'sdfsd', 'nameeee', 2, 100, 7, 0, 1)
+        cnt = 0
+        for msgcfg in self._mcList:
+            msgcfg.forget()
+        for msgcfg in mc._msgcfgs:
+            if cnt == len(self._mcList):
+                self._mcList.append(MessageConfigControl(self, cnt + 1, msgcfg._Id, msgcfg._name))
+            else:
+                self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
+            self._mcList[cnt].pack()
+            cnt += 1
 
 class SignalFrameControl(LabelFrame):
     def __init__(self, ro, **kwArg):
@@ -191,3 +256,21 @@ class SignalFrameControl(LabelFrame):
                 self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype)
             self._mapList[cnt].pack()
             cnt += 1
+
+def test():
+    root = Tk()
+    root.title('configration tool')
+    root.geometry('800x600+100+20')
+    lb = LabelFrame(root)
+    lb.pack()
+    mcc = MessageConfigControl(lb, 10, 'sdf', 'sdfsdfsdf')
+    mcc.pack()
+    mcc.ChangeValue(1, 'sdfsd', 'nameeee', 2, 100, 7, 0, 1)
+    print mcc
+    print mcc._chk
+
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    test()

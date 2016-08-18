@@ -145,6 +145,7 @@ class CanConfig(cm.CanMatrix):
             if bo._Id > 0x80000000:
                 bo._Id -= 0x80000000
                 bo._extended = 1
+        self._fl._list.sort(key = lambda Frame: Frame._name)
 
 class MapConfig(object):
     '''
@@ -204,10 +205,33 @@ class MapConfig(object):
         self.AddDbc(cc)
 
     def AddDbc(self, cc):
+        # ECU selection
         self._ecu = {}
         for ecu in cc._BUs._list:
             self._ecu[ecu._name] = False
+        # message frame configuration
+        self._msgcfgs = []
+        for fr in cc._fl._list:
+            self.AddMsgConfig(fr._Id)
+
         self._displayfunc(self)
+
+    def AddMsgConfig(self, mid):
+        self._msgcfgs.append(MessageConfig(msgid = mid))
+
+    def EditMsgConfig(self, msgid, name, nd, prd, tran, dlc, ide, en, chked):
+        for mc in self._msgcfgs:
+            if mc._Id == msgid:
+                mc._name = name
+                mc._node = nd
+                mc._prd = prd
+                mc._tran = tran
+                mc._DLC = dlc
+                mc._IDE = ide
+                mc._enable = en
+                mc._checked = chked
+                return True
+        return False
 
     # map of signal and variable
     def EditMap(self, num, sgl, st, tt, uniq):
@@ -229,7 +253,7 @@ class MapConfig(object):
         self._ecu = data['ecu']
         self._cancfg = data['canconfig']
         for sc in data['msgconfig']:
-            self._msgcfgs.append(MessageConfig(sc['ID'], sc['node'], sc['prd'],sc['trans'] \
+            self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd'],sc['trans'] \
                 , sc['sglfunc'], sc['DLC'], sc['ide'], sc['enable'], sc['checked']))
         # self._msgcfgs = data['msgconfig']
         num = 0
@@ -245,8 +269,9 @@ class MapConfig(object):
 class MessageConfig(object):
     '''
     '''
-    def __init__(self, msgid = '', nd = 0, prd = 100, tran = True, sf = '', dlc = 8, ide = True, en = True, chked = False):
-        self._ID = msgid
+    def __init__(self, msgid = '', na = '',nd = 0,  prd = 100, tran = False, sf = '', dlc = 8, ide = True, en = True, chked = False):
+        self._Id = msgid
+        self._name = na
         self._node = nd
         self._prd = prd
         self._tran = tran
@@ -255,6 +280,17 @@ class MessageConfig(object):
         self._IDE = ide
         self._enable = en
         self._checked = chked
+    def ChangeMsgCfg(mc):
+        self._Id = mc._Id
+        self._name = mc._name
+        self._node = mc._node
+        self._prd = mc._prd
+        self._tran = mc._tran
+        self._sglfunc = mc._sglfunc
+        self._DLC = mc._DLC
+        self._IDE = mc._IDE
+        self._enable = mc._enable
+        self._checked = mc._checked
 
 class SignalMap(object):
     '''
@@ -315,7 +351,8 @@ def test():
 
     cc = CanConfig()
     cc.ImportFromFile(r'E:\pyproj\gener\test\ks.dbc')
-    print cc._BUs
+    for fr in cc._fl._list:
+        print fr._name
 
 if __name__ == '__main__':
     test()
