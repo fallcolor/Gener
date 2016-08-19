@@ -145,6 +145,8 @@ class CanConfig(cm.CanMatrix):
             if bo._Id > 0x80000000:
                 bo._Id -= 0x80000000
                 bo._extended = 1
+            tmpstr = hex(bo._Id)
+            bo._Id = tmpstr[0:2] + tmpstr[2:-1].upper()
         self._fl._list.sort(key = lambda Frame: Frame._name)
 
 class MapConfig(object):
@@ -212,12 +214,12 @@ class MapConfig(object):
         # message frame configuration
         self._msgcfgs = []
         for fr in cc._fl._list:
-            self.AddMsgConfig(fr._Id)
+            self.AddMsgConfig(fr._Id, fr._name)
 
         self._displayfunc(self)
 
-    def AddMsgConfig(self, mid):
-        self._msgcfgs.append(MessageConfig(msgid = mid))
+    def AddMsgConfig(self, mid, name):
+        self._msgcfgs.append(MessageConfig(msgid = mid, na = name))
 
     def EditMsgConfig(self, msgid, name, nd, prd, tran, dlc, ide, en, chked):
         for mc in self._msgcfgs:

@@ -59,8 +59,8 @@ class SignalMapControl(object):
     def __init__(self, rootCom, varNum, varType, varName, cb2value = '', cb3value = ''):
         self._lf = LabelFrame(rootCom, text = '')
         self._num = Label(self._lf, width = 5, text = varNum)
-        self._type = Label(self._lf, width = 8, text = varType, anchor = 'sw')
-        self._var = Label(self._lf, width = 17, text = varName, anchor = 'sw')
+        self._type = Label(self._lf, width = 8, text = varType, anchor = 'w')
+        self._var = Label(self._lf, width = 17, text = varName, anchor = 'w')
         self._combo1 = ttk.Combobox(self._lf, width = 15)
         self._combo1.state(['readonly'])
         self._combo1.bind('<<ComboboxSelected>>', self.cb1Select)
@@ -134,21 +134,31 @@ class SignalMapControl(object):
 
 class MessageConfigControl(object):
     def __init__(self, rootCom, num, msgid, name):
+        self._chklen = 3
+        self._numlen = 3
+        self._Idlen = 12
+        self._namelen = 25
+        self._nodelen = 6
+        self._prdlen = 10
+        self._dlclen = 6
         self._chkVar = IntVar()
         self._chkEnable = IntVar()
+        self._nodeVar = StringVar()
         self._prdVar = StringVar()
         self._DLCVar = StringVar()
         self._lf = LabelFrame(rootCom, text = '')
-        self._chk = Checkbutton(self._lf, variable = self._chkVar)
-        self._num = Label(self._lf, text = num)
-        self._Id = Label(self._lf, text = msgid)
-        self._msgname = Label(self._lf, text = name)
-        self._node = ttk.Combobox(self._lf, width = 15)
-        self._prd = Entry(self._lf, textvariable = self._prdVar)
+        self._chk = Checkbutton(self._lf, variable = self._chkVar, width = self._chklen)
+        self._num = Label(self._lf, text = num, width = self._numlen)
+        self._Id = Label(self._lf, text = msgid, width = self._Idlen, anchor = 'e')
+        self._msgname = Label(self._lf, text = name, width = self._namelen, anchor = 'e')
+        self._node = Entry(self._lf, textvariable = self._nodeVar, width = self._prdlen, justify = CENTER)
+        self._node.insert(0, '2')
+        self._prd = Entry(self._lf, textvariable = self._prdVar, width = self._prdlen, justify = CENTER)
         self._prd.insert(0, '100')
-        self._DLC = Entry(self._lf, textvariable = self._DLCVar)
+        self._DLC = Entry(self._lf, textvariable = self._DLCVar, width = self._dlclen, justify = CENTER)
         self._DLC.insert(0, '8')
         self._enable = Checkbutton(self._lf, variable = self._chkEnable, text = 'Enable')
+
 
     def GetValue(self):
         return self._Id['text'], self._prd.get(), self._DLC.get(), self._chkEnable.get(), self._chkVar.get()
@@ -157,7 +167,7 @@ class MessageConfigControl(object):
         self._num['text'] = num
         self._Id['text'] = msgid
         self._msgname['text'] = name
-        self._node.set(node)
+        self._nodeVar.set(node)
         self._prdVar.set(prd)
         self._DLCVar.set(dlc)
         if en == 1:
@@ -186,9 +196,9 @@ class MessageConfigControl(object):
         self._num.pack(side = LEFT)
         self._Id.pack(side = LEFT)
         self._msgname.pack(side = LEFT)
-        self._node.pack(side = LEFT)
-        self._prd.pack(side = LEFT)
-        self._DLC.pack(side = LEFT)
+        self._node.pack(side = LEFT, padx = 8)
+        self._prd.pack(side = LEFT, padx = 8)
+        self._DLC.pack(side = LEFT, padx = 8)
         self._enable.pack(side = LEFT)
 
 
@@ -196,6 +206,7 @@ class MessageFrameControl(LabelFrame):
     def __init__(self, ro, **kwArg):
         LabelFrame.__init__(self, ro, **kwArg)
         self._chkFrm = None
+        self._mcFrm = None
         self._ecuList = []
         self._chkVar = []
         self._mcList = []
@@ -223,16 +234,21 @@ class MessageFrameControl(LabelFrame):
             cnt += 1
 
         # message config
-        # mcc = MessageConfigControl(self, 10, 'sdf', 'sdfsdfsdf')
-        # self._mcList.append(mcc)
-        # self._mcList[0].pack()
-        # self._mcList[0].ChangeValue(1, 'sdfsd', 'nameeee', 2, 100, 7, 0, 1)
+        if self._mcFrm is None:
+            # self._mcFrm = LabelFrame(self)
+            self._mcFrm = LabelFrame(self)
+            self._mcFrm.pack(fill = X, expand=True)
+            self._sb = Scrollbar(self._mcFrm)
+            self._sb.pack(side = RIGHT, fill = Y)
+            self._cvs = Canvas(self._mcFrm, yscrollcommand = self._sb.set,scrollregion=(0,0,800,700))
+            self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
+            self._sb['command'] = self._cvs.yview
         cnt = 0
         for msgcfg in self._mcList:
             msgcfg.forget()
         for msgcfg in mc._msgcfgs:
             if cnt == len(self._mcList):
-                self._mcList.append(MessageConfigControl(self, cnt + 1, msgcfg._Id, msgcfg._name))
+                self._mcList.append(MessageConfigControl(self._cvs, cnt + 1, msgcfg._Id, msgcfg._name))
             else:
                 self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
             self._mcList[cnt].pack()
@@ -261,16 +277,22 @@ def test():
     root = Tk()
     root.title('configration tool')
     root.geometry('800x600+100+20')
-    lb = LabelFrame(root)
-    lb.pack()
-    mcc = MessageConfigControl(lb, 10, 'sdf', 'sdfsdfsdf')
-    mcc.pack()
-    mcc.ChangeValue(1, 'sdfsd', 'nameeee', 2, 100, 7, 0, 1)
-    print mcc
-    print mcc._chk
+
+    cv = Canvas(root)
+    sb = Scrollbar(root, command = cv.yview, orient = 'vertical')
+    cv['yscrollcommand'] = sb.set
+
+    cv.pack(side = LEFT, fill = Y, expand = True)
+    sb.pack(side = RIGHT, fill = Y)
+
+    for i in range(30):
+        b = Button(cv, text = 'button %s' % i)
+        b.pack()
 
     root.mainloop()
 
 
 if __name__ == '__main__':
     test()
+
+# root.bind(<MouseWheel>)
