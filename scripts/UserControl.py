@@ -7,8 +7,8 @@ import tkFileDialog
 import ttk
 
 class FileDealControl(object):
-    def __init__(self, rootCom, cbfunc = None, inText = "FileDeal"):
-        self._open = True
+    def __init__(self, rootCom, cbfunc = None, inText = "FileDeal", save = False):
+        self._save = save
         self._fileOption = {}
         self._root = rootCom
         self._text = inText
@@ -29,20 +29,33 @@ class FileDealControl(object):
         self._fileOption['title'] = title
 
     def OpenOrSaveFile(self):
-        if self._fileOption.has_key('title'):
-            f = tkFileDialog.askopenfile(mode = 'r', **self._fileOption)
-
-            if f:
-                self._label['text'] = f.name
-                if self._callbackFunc == None:
-                    print 'no binding callback function'
+        if self._save:
+            if self._fileOption.has_key('title'):
+                f = tkFileDialog.asksaveasfilename(**self._fileOption)
+                print f
+                if f:
+                    if self._callbackFunc == None:
+                        print 'no binding callback function'
+                    else:
+                        self._callbackFunc(f)
                 else:
-                    self._callbackFunc(f.name)
-                    print 'file diag call back'
+                    print 'save file failed'
             else:
-                print 'Open dbc file failed'
+                print 'Please add file options.'
         else:
-            print 'Please add file options.'
+            if self._fileOption.has_key('title'):
+                f = tkFileDialog.askopenfile(mode = 'r', **self._fileOption)
+                if f:
+                    self._label['text'] = f.name
+                    if self._callbackFunc == None:
+                        print 'no binding callback function'
+                    else:
+                        self._callbackFunc(f.name)
+                        
+                else:
+                    print 'Open file failed'
+            else:
+                print 'Please add file options.'
 
     def GetPath(self):
         return _label['text']
@@ -132,8 +145,9 @@ class SignalMapControl(object):
         self._combo2.pack(side = LEFT)
         self._combo3.pack(side = LEFT)
 
-class MessageConfigControl(object):
-    def __init__(self, rootCom, num, msgid, name):
+class MessageConfigControl(Frame):
+    def __init__(self, parent, *arg, **karg):
+        Frame.__init__(self, parent, **karg)
         self._chklen = 3
         self._numlen = 3
         self._Idlen = 12
@@ -146,22 +160,41 @@ class MessageConfigControl(object):
         self._nodeVar = StringVar()
         self._prdVar = StringVar()
         self._DLCVar = StringVar()
-        self._lf = LabelFrame(rootCom, text = '')
-        self._chk = Checkbutton(self._lf, variable = self._chkVar, width = self._chklen)
-        self._num = Label(self._lf, text = num, width = self._numlen)
-        self._Id = Label(self._lf, text = msgid, width = self._Idlen, anchor = 'e')
-        self._msgname = Label(self._lf, text = name, width = self._namelen, anchor = 'e')
-        self._node = Entry(self._lf, textvariable = self._nodeVar, width = self._prdlen, justify = CENTER)
+        self._chk = Checkbutton(self, variable = self._chkVar, width = self._chklen)
+        self._chk['command'] = self.MessageChecked
+        self._num = Label(self, text = arg[0], width = self._numlen)
+        self._Id = Label(self, text = arg[1], width = self._Idlen, anchor = 'e')
+        self._msgname = Label(self, text = arg[2], width = self._namelen, anchor = 'w')
+        self._node = Entry(self, textvariable = self._nodeVar, width = self._prdlen, justify = CENTER)
         self._node.insert(0, '2')
-        self._prd = Entry(self._lf, textvariable = self._prdVar, width = self._prdlen, justify = CENTER)
+        self._prd = Entry(self, textvariable = self._prdVar, width = self._prdlen, justify = CENTER)
         self._prd.insert(0, '100')
-        self._DLC = Entry(self._lf, textvariable = self._DLCVar, width = self._dlclen, justify = CENTER)
+        self._DLC = Entry(self, textvariable = self._DLCVar, width = self._dlclen, justify = CENTER)
         self._DLC.insert(0, '8')
-        self._enable = Checkbutton(self._lf, variable = self._chkEnable, text = 'Enable')
+        self._enable = Checkbutton(self, variable = self._chkEnable, text = 'Enable')
 
+        self._chk.pack(side = LEFT)
+        self._num.pack(side = LEFT)
+        self._Id.pack(side = LEFT)
+        self._msgname.pack(side = LEFT, padx = 8)
+        self._node.pack(side = LEFT, padx = 8)
+        self._prd.pack(side = LEFT, padx = 8)
+        self._DLC.pack(side = LEFT, padx = 8)
+        self._enable.pack(side = LEFT)
+
+    def MessageChecked(self):
+        self._DLCVar.set(self._chkVar.get())
+        if self._chkVar.get() == 0:
+            self._node['bg'] = 'gray'
+            self._prd['bg'] = 'gray'
+            self._DLC['bg'] = 'gray'
+        else:
+            self._node['bg'] = 'white'
+            self._prd['bg'] = 'white'
+            self._DLC['bg'] = 'white'
 
     def GetValue(self):
-        return self._Id['text'], self._prd.get(), self._DLC.get(), self._chkEnable.get(), self._chkVar.get()
+        return self._Id['text'], self._msgname['text'], self._node.get(), self._prd.get(), self._DLC.get(), self._chkEnable.get(), self._chkVar.get()
 
     def ChangeValue(self, num, msgid, name, node, prd, dlc, en, chk):
         self._num['text'] = num
@@ -178,29 +211,7 @@ class MessageConfigControl(object):
             self._chk.select()
         else:
             self._chk.deselect()
-
-    def forget(self):
-        self._lf.forget()
-        self._chk.forget()
-        self._num.forget()
-        self._Id.forget()
-        self._msgname.forget()
-        self._node.forget()
-        self._prd.forget()
-        self._DLC.forget()
-        self._enable.forget()
-
-    def pack(self):
-        self._lf.pack(fill = X)
-        self._chk.pack(side = LEFT)
-        self._num.pack(side = LEFT)
-        self._Id.pack(side = LEFT)
-        self._msgname.pack(side = LEFT)
-        self._node.pack(side = LEFT, padx = 8)
-        self._prd.pack(side = LEFT, padx = 8)
-        self._DLC.pack(side = LEFT, padx = 8)
-        self._enable.pack(side = LEFT)
-
+        self.MessageChecked()
 
 class MessageFrameControl(LabelFrame):
     def __init__(self, ro, **kwArg):
@@ -210,6 +221,28 @@ class MessageFrameControl(LabelFrame):
         self._ecuList = []
         self._chkVar = []
         self._mcList = []
+
+    def GetValue(self):
+        chkValue = {}
+        mcValue = []
+        # ecu check valud
+        cnt = 0
+        for ecu in self._ecuList:
+            chkValue[ecu] = bool(self._chkVar[cnt])
+            cnt += 1
+        for mc in self._mcList:
+            tmpstr = mc.GetValue()
+            tmp = {}
+            tmp['ID'] = tmpstr[0]
+            tmp['name'] = tmpstr[1]
+            tmp['node'] = tmpstr[2]
+            tmp['prd'] = tmpstr[3]
+            tmp['DLC'] = tmpstr[4]
+            tmp['enable'] = tmpstr[5]
+            tmp['checked'] = tmpstr[6]
+            mcValue.append(tmp)
+        return chkValue, mcValue
+
 
     def Refresh(self, mc):
         # check button
@@ -235,28 +268,32 @@ class MessageFrameControl(LabelFrame):
 
         # message config
         if self._mcFrm is None:
-            # self._mcFrm = LabelFrame(self)
             self._mcFrm = LabelFrame(self)
-            self._mcFrm.pack(fill = X, expand=True)
+            self._mcFrm.pack(fill = BOTH, expand=True)
             self._sb = Scrollbar(self._mcFrm)
             self._sb.pack(side = RIGHT, fill = Y)
-            self._cvs = Canvas(self._mcFrm, yscrollcommand = self._sb.set,scrollregion=(0,0,800,700))
+            self._cvs = Canvas(self._mcFrm)
+            self._cvs.forget()
             self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
+            self._cvs['yscrollcommand'] = self._sb.set
             self._sb['command'] = self._cvs.yview
         cnt = 0
-        for msgcfg in self._mcList:
-            msgcfg.forget()
-        for msgcfg in mc._msgcfgs:
-            if cnt == len(self._mcList):
-                self._mcList.append(MessageConfigControl(self._cvs, cnt + 1, msgcfg._Id, msgcfg._name))
-            else:
-                self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
-            self._mcList[cnt].pack()
-            cnt += 1
+        self._cvs.delete('all')
+        self._mcList = []
 
-class SignalFrameControl(LabelFrame):
+        for msgcfg in mc._msgcfgs:
+            # if cnt == len(self._mcList):
+            self._mcList.append(MessageConfigControl(self._cvs, cnt + 1, msgcfg._Id, msgcfg._name))
+            self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
+            self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mcList[cnt])
+            # else:
+            #     self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
+            cnt += 1
+        self._cvs['scrollregion'] = (0, 0, 800, cnt * 30)
+
+class SignalFrameControl(Frame):
     def __init__(self, ro, **kwArg):
-        LabelFrame.__init__(self, ro, **kwArg)
+        Frame.__init__(self, ro, **kwArg)
         self._mapList = []
     def Refresh(self, mc):
         # print 'Call SignalFrameControl.Refresh()'
@@ -279,15 +316,13 @@ def test():
     root.geometry('800x600+100+20')
 
     cv = Canvas(root)
-    sb = Scrollbar(root, command = cv.yview, orient = 'vertical')
+    sb = Scrollbar(root)
     cv['yscrollcommand'] = sb.set
+    sb['command'] = cv.yview
 
-    cv.pack(side = LEFT, fill = Y, expand = True)
-    sb.pack(side = RIGHT, fill = Y)
-
-    for i in range(30):
-        b = Button(cv, text = 'button %s' % i)
-        b.pack()
+    for i in range(10):
+        mc = MessageConfigControl(cv, i, 'sdfsdf', 'sdfsdf')
+        mc.pack()
 
     root.mainloop()
 

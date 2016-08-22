@@ -48,10 +48,22 @@ def StartGui():
     indbc.ConfigOpen('data for can', '.dbc', 'Open dbc')
     indbc.pack()
 
-    geneBtn = Button(root, text = "generate code")
+    insv = uc.FileDealControl(root, cbfunc = mc.ImportFromFile, inText = 'input sv file')
+    insv.ConfigOpen('data for sv', '.sv', 'Open sv')
+    insv.pack()
+
+    outsv = uc.FileDealControl(root, cbfunc = mc.ExportToFile, inText = 'Output sv file', save = True)
+    outsv.ConfigOpen('data for sv', '.sv', 'Save sv')
+    outsv.pack()
+
+    fr = Frame(root)
+    fr.pack(fill = X)
+    # saveBtn = Button(fr, text = "save sv file")
+    # saveBtn.pack(side = LEFT)
+    geneBtn = Button(fr, text = "generate code")
     geneBtn.pack()
 
-    nb.pack(fill = BOTH, expand = 1)
+    nb.pack(fill = BOTH, expand = 1, side = BOTTOM)
     
     root.mainloop()
 

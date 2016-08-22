@@ -177,11 +177,13 @@ class MapConfig(object):
         self._appver = ac._version
         self._prj = ac._prj
         # self._maps = []
+
         cnt = 1
         for var in ac._vars:
             self._maps.append(SignalMap(cnt, var))
             cnt += 1
         self._displayfunc(self)
+
 
     def AddVarsFrmoFile(self, infile):
         '''
@@ -254,32 +256,58 @@ class MapConfig(object):
         self._prj = data['project']
         self._ecu = data['ecu']
         self._cancfg = data['canconfig']
+        self._msgcfgs = []  # clear last data
+        self._maps = []
         for sc in data['msgconfig']:
             self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd'],sc['trans'] \
-                , sc['sglfunc'], sc['DLC'], sc['ide'], sc['enable'], sc['checked']))
-        # self._msgcfgs = data['msgconfig']
+                , sc['DLC'], sc['enable'], sc['checked']))
         num = 0
         for mp in data['map']:
             self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
-        # self._maps = data['map']
         self._displayfunc(self)
 
+    def ExportToFile(self, outfile):
+        data = {}
+        data['time'] = self._time
+        data['hwver'] = self._hwver
+        data['appver'] = self._appver
+        data['project'] = self._prj
+        data['ecu'] = self._ecu
+        data['canconfig'] = self._cancfg
+        data['msgconfig'] = []
+        for mc in self._msgcfgs:            
+            data['msgconfig'].append(mc.GetValue())
+        data['map'] = []
+        for mp in self._maps:
+            data['map'].append(mp.GetValue())
+        try:
+            f = open(outfile, 'w')
+            f.write(json.dumps(data, indent = 2))
+            f.close()
+            print 'success for generated json file!'
+        except Exception, e:
+            print Exception,":",e
+
+    def ChangeFromFrame(self, ecu, cc, mc, mp):
+        self. _ecu = ecu
+        self._cancfg = cc
+        self._msgcfgs = mc
+        self._maps = mp
+        
     def AddDisplayFunc(self, func):
         self._displayfunc = func
 
 class MessageConfig(object):
     '''
     '''
-    def __init__(self, msgid = '', na = '',nd = 0,  prd = 100, tran = False, sf = '', dlc = 8, ide = True, en = True, chked = False):
+    def __init__(self, msgid = '', na = '',nd = 2,  prd = 100, tran = False, dlc = 8, en = False, chked = False):
         self._Id = msgid
         self._name = na
         self._node = nd
         self._prd = prd
         self._tran = tran
-        self._sglfunc = sf
         self._DLC = dlc
-        self._IDE = ide
         self._enable = en
         self._checked = chked
     def ChangeMsgCfg(mc):
@@ -293,6 +321,17 @@ class MessageConfig(object):
         self._IDE = mc._IDE
         self._enable = mc._enable
         self._checked = mc._checked
+    def GetValue(self):
+        re = {}
+        re['ID'] = self._Id
+        re['name'] = self._name
+        re['node'] = self._node
+        re['prd'] = self._prd
+        re['trans'] = self._tran
+        re['DLC'] = self._DLC
+        re['enable'] = self._enable
+        re['checked'] = self._checked
+        return re
 
 class SignalMap(object):
     '''
@@ -305,6 +344,16 @@ class SignalMap(object):
         self._sgltype = st      # msg name or DI\DO\PWM
         self._transtype = tt    # can or hw IO
         self._uniq = uniq
+    def GetValue(self):
+        re = []
+        re.append(self._var)
+        re.append(self._type)
+        re.append(self._signal)
+        re.append(self._sgltype)
+        re.append(self._transtype)
+        re.append(self._uniq)
+        return re
+
 
 def EmptyFunc(ef):
     pass
