@@ -65,25 +65,28 @@ class FileDealControl(object):
         self._button.pack(side = LEFT);
         self._label.pack(side = LEFT);
 
-class SignalMapControl(object):
+class SignalMapControl(Frame):
     '''
     a control for signal mapping
     '''
-    def __init__(self, rootCom, varNum, varType, varName, cb2value = '', cb3value = ''):
-        self._lf = LabelFrame(rootCom, text = '')
-        self._num = Label(self._lf, width = 5, text = varNum)
-        self._type = Label(self._lf, width = 8, text = varType, anchor = 'w')
-        self._var = Label(self._lf, width = 17, text = varName, anchor = 'w')
-        self._combo1 = ttk.Combobox(self._lf, width = 15)
+    def __init__(self, rootCom, varNum, varType, varName, cb1value = '', cb2value = '', cb3value = '', unk = False, **kArg):
+        Frame.__init__(self, rootCom, **kArg)
+        # self._lf = LabelFrame(rootCom, text = '')
+        self._num = Label(self, width = 5, text = varNum)
+        self._type = Label(self, width = 8, text = varType, anchor = 'w')
+        self._var = Label(self, width = 17, text = varName, anchor = 'w')
+        self._combo1 = ttk.Combobox(self, width = 15)
         self._combo1.state(['readonly'])
         self._combo1.bind('<<ComboboxSelected>>', self.cb1Select)
-        self._combo2 = ttk.Combobox(self._lf, width = 30)        
+        self._combo1.set(cb1value)
+        self._combo2 = ttk.Combobox(self, width = 30)        
         self._combo2.state(['readonly'])
-        self._combo2.bind('<<ComboboxSelected>>', self.cb2Select)
-        self.AddCb2Value(cb2value)
-        self._combo3 = ttk.Combobox(self._lf, width = 25)
-        self._combo3.state(['readonly'])
-        self.AddCb3Value(cb3value)
+        self._combo2.bind('<<ComboboxSelected>>', self.cb2Select)        
+        self._combo2.set(cb2value)
+        self._combo3 = ttk.Combobox(self, width = 25)
+        self._combo3.state(['readonly'])        
+        self._combo3.set(cb3value)
+        self._unique = unk
 
     def cb1Select(self, e = None):
         if self._combo1.get() == "CAN signal":  
@@ -105,45 +108,46 @@ class SignalMapControl(object):
     def AddCb3Value(self, vl):
         self._combo3['value'] = vl
 
-    def EditMap(self, varNum, varType, varName, cb2value = '', cb3value = ''):
+    def EditMap(self, varNum, varType, varName, cb1value = '', cb2value = '', cb3value = '', unk = False):
         self._num['text'] = varNum
         self._type['text'] = varType
         self._var['text'] = varName
-        self.AddCb2Value(cb2value)
-        self.AddCb3Value(cb3value)
+        self._combo1.set(cb1value)
+        self._combo2.set(cb2value)
+        self._combo3.set(cb3value)
+        self._unique = unk
 
     def GetMap(self):
-        cb1str = self._combo1.get()
+        re = []
+        re.append(self._var['text'])
+        re.append(self._type['text'])
         cb3str = self._combo3.get()
-        if self._combo1.get() == "CAN signal":
-            if cb1str and cb3str:
-                return self._num['text'], self._var['text'], cb1str, cb3str.split('(')[0], self._type['text']
-            else:
-                return self._num['text'], self._var['text'], None, None, None
-        else:
-            if cb1str and cb3str:
-                return self._num['text'], self._var['text'], cb1str, cb3str, self._type['text']
-            else:
-                return self._num['text'], self._var['text'], None, None, None
+        re.append(cb3str)       
+        cb2str = self._combo2.get()
+        re.append(cb2str)
+        cb1str = self._combo1.get()
+        re.append(cb1str)
+        re.append(self._unique)
+        return re
 
-    def forget(self):
-        self._lf.forget()
-        self._num.forget()
-        self._type.forget()
-        self._var.forget()
-        self._combo1.forget()
-        self._combo2.forget()
-        self._combo3.forget()
-        # self.forget()
+    # def forget(self):
+    #     self._lf.forget()
+    #     self._num.forget()
+    #     self._type.forget()
+    #     self._var.forget()
+    #     self._combo1.forget()
+    #     self._combo2.forget()
+    #     self._combo3.forget()
+    #     # self.forget()
 
-    def pack(self):
-        self._lf.pack(fill = X)
-        self._num.pack(side = LEFT)
-        self._type.pack(side = LEFT)
-        self._var.pack(side = LEFT)
-        self._combo1.pack(side = LEFT)
-        self._combo2.pack(side = LEFT)
-        self._combo3.pack(side = LEFT)
+    # def pack(self):
+    #     self._lf.pack(fill = X)
+    #     self._num.pack(side = LEFT)
+    #     self._type.pack(side = LEFT)
+    #     self._var.pack(side = LEFT)
+    #     self._combo1.pack(side = LEFT)
+    #     self._combo2.pack(side = LEFT)
+    #     self._combo3.pack(side = LEFT)
 
 class MessageConfigControl(Frame):
     def __init__(self, parent, *arg, **karg):
@@ -171,7 +175,7 @@ class MessageConfigControl(Frame):
         self._prd.insert(0, '100')
         self._DLC = Entry(self, textvariable = self._DLCVar, width = self._dlclen, justify = CENTER)
         self._DLC.insert(0, '8')
-        self._enable = Checkbutton(self, variable = self._chkEnable, text = 'Enable')
+        self._enable = Checkbutton(self, variable = self._chkEnable)
 
         self._chk.pack(side = LEFT)
         self._num.pack(side = LEFT)
@@ -180,7 +184,7 @@ class MessageConfigControl(Frame):
         self._node.pack(side = LEFT, padx = 8)
         self._prd.pack(side = LEFT, padx = 8)
         self._DLC.pack(side = LEFT, padx = 8)
-        self._enable.pack(side = LEFT)
+        self._enable.pack(side = LEFT, padx = 8)
 
     def MessageChecked(self):
         self._DLCVar.set(self._chkVar.get())
@@ -228,7 +232,7 @@ class MessageFrameControl(LabelFrame):
         # ecu check valud
         cnt = 0
         for ecu in self._ecuList:
-            chkValue[ecu] = bool(self._chkVar[cnt])
+            chkValue[ecu['text']] = bool(self._chkVar[cnt])
             cnt += 1
         for mc in self._mcList:
             tmpstr = mc.GetValue()
@@ -268,6 +272,16 @@ class MessageFrameControl(LabelFrame):
 
         # message config
         if self._mcFrm is None:
+            lf = Frame(self)
+            l0 = Label(lf, text = 'check', width = 5).pack(side = LEFT, padx = 2)
+            l1 = Label(lf, text = 'No.', width = 5, justify = CENTER).pack(side = LEFT)
+            l2 = Label(lf, text = 'ID', width = 12).pack(side = LEFT)
+            l3 = Label(lf, text = 'name', width = 23).pack(side = LEFT, padx = 6)
+            l4 = Label(lf, text = 'node', width = 6).pack(side = LEFT, padx = 26)
+            l5 = Label(lf, text = 'prd', width = 10).pack(side = LEFT, padx = 8)
+            l6 = Label(lf, text = 'DLC', width = 6).pack(side = LEFT, padx = 8)
+            l7 = Label(lf, text = 'enable', width = 6).pack(side = LEFT)
+            lf.pack(fill = X)
             self._mcFrm = LabelFrame(self)
             self._mcFrm.pack(fill = BOTH, expand=True)
             self._sb = Scrollbar(self._mcFrm)
@@ -295,18 +309,35 @@ class SignalFrameControl(Frame):
     def __init__(self, ro, **kwArg):
         Frame.__init__(self, ro, **kwArg)
         self._mapList = []
+        self._smFrm = None
+    def GetValue(self):
+        re = []
+        for sm in self._mapList:
+            re.append(sm.GetMap())
+        return re
+
     def Refresh(self, mc):
         # print 'Call SignalFrameControl.Refresh()'
+        if self._smFrm is None:
+            self._smFrm = LabelFrame(self).pack(fill = BOTH, expand=True)
+            self._sb = Scrollbar(self._smFrm)
+            self._sb.pack(side = RIGHT, fill = Y)
+            self._cvs = Canvas(self._smFrm)
+            self._cvs.forget()
+            self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
+            self._cvs['yscrollcommand'] = self._sb.set
+            self._sb['command'] = self._cvs.yview
         cnt = 0
-        for vs in self._mapList:
-            vs.forget()
+        self._cvs.delete('all')
+        self._mapList = []
 
         for vs in mc._maps:
             if cnt == len(self._mapList):
-                sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype)
+                print vs._num, vs._type,'a', vs._var,'b', vs._transtype,'c', vs._sgltype,'c', vs._signal
+                sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
                 self._mapList.append(sm)
             else:
-                self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype)
+                self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
             self._mapList[cnt].pack()
             cnt += 1
 

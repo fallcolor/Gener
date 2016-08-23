@@ -171,6 +171,8 @@ class MapConfig(object):
         self._msgcfgs = []
         self._maps = []
         self._displayfunc = EmptyFunc
+        self._dbc = CanConfig()
+        self._hc = HwConfig()
 
     # import data from app config
     def AddVariables(self, ac):
@@ -204,9 +206,8 @@ class MapConfig(object):
 
     # import data from dbc
     def AddDbcFromFile(self, infile):
-        cc = CanConfig()
-        cc.ImportFromFile(infile)
-        self.AddDbc(cc)
+        self._dbc.ImportFromFile(infile)
+        self.AddDbc(self._dbc)
 
     def AddDbc(self, cc):
         # ECU selection
@@ -259,7 +260,7 @@ class MapConfig(object):
         self._msgcfgs = []  # clear last data
         self._maps = []
         for sc in data['msgconfig']:
-            self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd'],sc['trans'] \
+            self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd'] \
                 , sc['DLC'], sc['enable'], sc['checked']))
         num = 0
         for mp in data['map']:
@@ -283,17 +284,24 @@ class MapConfig(object):
             data['map'].append(mp.GetValue())
         try:
             f = open(outfile, 'w')
-            f.write(json.dumps(data, indent = 2))
+            f.write(json.dumps(data, indent = 4))
             f.close()
             print 'success for generated json file!'
         except Exception, e:
             print Exception,":",e
 
-    def ChangeFromFrame(self, ecu, cc, mc, mp):
-        self. _ecu = ecu
-        self._cancfg = cc
-        self._msgcfgs = mc
-        self._maps = mp
+    def ChangeFromFrame(self, ecus, ccs, mcs, mps):
+        self. _ecu = ecus
+        self._cancfg = ccs
+        self._msgcfgs = []
+        for sc in mcs:
+            self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd']\
+                , sc['DLC'], sc['enable'], sc['checked']))
+        self._maps = []
+        num = 0
+        for mp in mps:
+            self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
+            num += 1
         
     def AddDisplayFunc(self, func):
         self._displayfunc = func
