@@ -71,6 +71,15 @@ class HwConfig(object):
         self._DO = data['DO']
         self._PWM = data['PWM']
         self._AI = data['AI']
+    def IsNotEmpty(self):
+        hclen = 0;
+        hclen += len(self._DI)
+        hclen += len(self._DO)
+        hclen += len(self._PWM)
+        hclen += len(self._AI)
+        if hclen > 0:
+            return True
+        return False
 
 class CanConfig(cm.CanMatrix):
     def ImportFromFile(self, infile):
@@ -149,6 +158,11 @@ class CanConfig(cm.CanMatrix):
             bo._Id = tmpstr[0:2] + tmpstr[2:-1].upper()
         self._fl._list.sort(key = lambda Frame: Frame._name)
 
+    def IsNotEmpty(self):
+        if len(self._fl._list) > 0:
+            return True
+        return False
+
 class MapConfig(object):
     '''
     contain all configuration of project, with following attributes:
@@ -212,7 +226,7 @@ class MapConfig(object):
     def AddDbc(self, cc):
         # ECU selection
         self._ecu = {}
-        for ecu in cc._BUs._list:
+        for ecu in cc._BUs._list:       ## if ecu._name in self.ecu.key()
             self._ecu[ecu._name] = False
         # message frame configuration
         self._msgcfgs = []
@@ -248,6 +262,13 @@ class MapConfig(object):
                 self._uniq = uniq
                 return True
         return False
+    def GetMaps(self, signal):
+        relist = []
+        for sv in self._maps:
+            if signal == sv._signal:
+                relist.append([sv._var, sv._type])
+        return relist
+
     def ImportFromFile(self, infile):
         f = open(infile, 'rb')
         data = json.loads(f.read())
@@ -291,7 +312,7 @@ class MapConfig(object):
             print Exception,":",e
 
     def ChangeFromFrame(self, ecus, ccs, mcs, mps):
-        self. _ecu = ecus
+        self._ecu = ecus
         self._cancfg = ccs
         self._msgcfgs = []
         for sc in mcs:
@@ -302,7 +323,17 @@ class MapConfig(object):
         for mp in mps:
             self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
-        
+
+    def GetTransEcu(self):
+        re = []
+        for ecu in self._ecu:
+            if self._ecu[ecu]:
+                re.append(ecu)
+        return re
+
+    def CheckSelf(self):
+        return True
+
     def AddDisplayFunc(self, func):
         self._displayfunc = func
 

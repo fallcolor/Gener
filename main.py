@@ -10,12 +10,13 @@ import ttk
 # user module
 import scripts.ConfigClass as cc
 import scripts.UserControl as uc
+import scripts.GeneCanCode as gcc
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 def StartGui():
-    global val, root, nb, msgFrame, sglFrame, mc, dbc, hc
+    global val, root, nb, msgFrame, sglFrame, mc, dbc, hc, outsv
     root = Tk()
     root.title('configration tool')
     root.geometry('800x600+100+20')
@@ -61,7 +62,7 @@ def StartGui():
     fr.pack(fill = X)
     saveBtn = Button(fr, text = "save sv file", command = SaveData)
     saveBtn.pack(side = LEFT)
-    geneBtn = Button(fr, text = "generate code")
+    geneBtn = Button(fr, text = "generate code", command = GenerateCode)
     geneBtn.pack(side = LEFT)
 
     nb.pack(fill = BOTH, expand = 1, side = BOTTOM)
@@ -80,6 +81,14 @@ def SaveData():
 def ipdbc(infile):
     mc.AddDbcFromFile(infile)
     dbc.ImportFromFile(infile)
+
+def GenerateCode():
+    SaveData()
+    tmpstr = ''
+    print len(mc._dbc._fl._list)
+    if mc.CheckSelf():
+        tmpstr = gcc.GenerateCanCode(mc._dbc, mc, mc.GetTransEcu())
+    print tmpstr
 
 
 if __name__ == '__main__':

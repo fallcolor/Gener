@@ -39,7 +39,7 @@ class FileDealControl(object):
                     else:
                         self._callbackFunc(f)
                 else:
-                    print 'save file failed'
+                    print 'save file failed', f
             else:
                 print 'Please add file options.'
         else:
@@ -53,7 +53,7 @@ class FileDealControl(object):
                         self._callbackFunc(f.name)
                         
                 else:
-                    print 'Open file failed'
+                    print 'Open file failed', f.name
             else:
                 print 'Please add file options.'
 
@@ -75,11 +75,11 @@ class SignalMapControl(Frame):
         self._num = Label(self, width = 5, text = varNum)
         self._type = Label(self, width = 8, text = varType, anchor = 'w')
         self._var = Label(self, width = 17, text = varName, anchor = 'w')
-        self._combo1 = ttk.Combobox(self, width = 15)
+        self._combo1 = ttk.Combobox(self, width = 13)
         self._combo1.state(['readonly'])
         self._combo1.bind('<<ComboboxSelected>>', self.cb1Select)
         self._combo1.set(cb1value)
-        self._combo2 = ttk.Combobox(self, width = 30)        
+        self._combo2 = ttk.Combobox(self, width = 28)        
         self._combo2.state(['readonly'])
         self._combo2.bind('<<ComboboxSelected>>', self.cb2Select)        
         self._combo2.set(cb2value)
@@ -87,20 +87,31 @@ class SignalMapControl(Frame):
         self._combo3.state(['readonly'])        
         self._combo3.set(cb3value)
         self._unique = unk
+        self._signals = {}
+
+        self._num.pack(side = LEFT)
+        self._type.pack(side = LEFT)
+        self._var.pack(side = LEFT)
+        self._combo1.pack(side = LEFT)
+        self._combo2.pack(side = LEFT)
+        self._combo3.pack(side = LEFT)
 
     def cb1Select(self, e = None):
         if self._combo1.get() == "CAN signal":  
-            self.AddCb2Value(signals['CAN signal'].keys())
+            self.AddCb2Value(self._signals['CAN signal'].keys())
         elif self._combo1.get() == "Hareware IO":  
-            self.AddCb2Value(signals['Hareware IO'].keys())
+            self.AddCb2Value(self._signals['Hareware IO'].keys())
 
     def cb2Select(self, e = None):
         if self._combo1.get() == "Hareware IO":  
-            self.AddCb3Value(signals['Hareware IO'][self._combo2.get()])            
+            self.AddCb3Value(self._signals['Hareware IO'][self._combo2.get()])            
             self._combo3.set('')
         elif self._combo1.get() == "CAN signal":  
-            self.AddCb3Value(signals['CAN signal'][self._combo2.get()])            
+            self.AddCb3Value(self._signals['CAN signal'][self._combo2.get()])            
             self._combo3.set('')
+
+    def AddCb1Value(self, vl):
+        self._combo1['value'] = vl
 
     def AddCb2Value(self, vl):
         self._combo2['value'] = vl
@@ -299,7 +310,7 @@ class MessageFrameControl(LabelFrame):
             # if cnt == len(self._mcList):
             self._mcList.append(MessageConfigControl(self._cvs, cnt + 1, msgcfg._Id, msgcfg._name))
             self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
-            self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mcList[cnt])
+            self._cvs.create_window(0, cnt * 30, anchor = NW, window = self._mcList[cnt])
             # else:
             #     self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
             cnt += 1
@@ -317,9 +328,10 @@ class SignalFrameControl(Frame):
         return re
 
     def Refresh(self, mc):
-        # print 'Call SignalFrameControl.Refresh()'
+        
         if self._smFrm is None:
-            self._smFrm = LabelFrame(self).pack(fill = BOTH, expand=True)
+            self._smFrm = LabelFrame(self)
+            self._smFrm.pack(fill = BOTH, expand=True)
             self._sb = Scrollbar(self._smFrm)
             self._sb.pack(side = RIGHT, fill = Y)
             self._cvs = Canvas(self._smFrm)
@@ -331,15 +343,34 @@ class SignalFrameControl(Frame):
         self._cvs.delete('all')
         self._mapList = []
 
+        # fresh combobox value
+        cb1value = []
+        if len(mc._dbc._fl._list) > 0:
+            cb1value.append('CAN signal')
+
+        if mc._hc.IsNotEmpty():
+            cb1value.append('Hardware IO')
+
         for vs in mc._maps:
-            if cnt == len(self._mapList):
-                print vs._num, vs._type,'a', vs._var,'b', vs._transtype,'c', vs._sgltype,'c', vs._signal
-                sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
-                self._mapList.append(sm)
-            else:
-                self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
-            self._mapList[cnt].pack()
+            sm = SignalMapControl(self._cvs, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
+            # print len(mc._dbc._fl._list)
+            if mc._dbc.IsNotEmpty():
+                sm._signals['CAN signal'] = mc._dbc.getSignals()
+                sm.AddCb1Value(sm._signals.keys())
+                sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
+                sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
+            self._mapList.append(sm)
+            self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mapList[cnt])
+
+            # if cnt == len(self._mapList):
+            #     print vs._num, vs._type,'a', vs._var,'b', vs._transtype,'c', vs._sgltype,'c', vs._signal
+            #     sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
+            #     self._mapList.append(sm)
+            # else:
+            #     self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
+            # self._mapList[cnt].pack()
             cnt += 1
+        self._cvs['scrollregion'] = (0, 0, 800, cnt * 30)
 
 def test():
     root = Tk()

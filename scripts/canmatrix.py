@@ -455,7 +455,7 @@ class CanMatrix(object):
     def getSignals(self):
         re = {}
         for fr in self._fl._list:
-            frid = fr._name + ' (0x' + '%X' % fr._Id + ')'
+            frid = fr._name + ' (0x' + '%s' % fr._Id + ')'
             listSignal = []
             for sgl in fr._signals:
                 strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
