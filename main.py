@@ -26,6 +26,7 @@ def StartGui():
     # hc = cc.HwConfig()
 
     nb = ttk.Notebook(root)
+    nb.bind('<<NotebookTabChanged>>', NoteBookSelected)
     msgFrame = uc.MessageFrameControl(nb, height = 20, width = 30)
     sglFrame = uc.SignalFrameControl(nb, height = 20, width = 30)
     nb.add(msgFrame, text = 'Basic config')
@@ -69,7 +70,14 @@ def StartGui():
     
     root.mainloop()
 
+def NoteBookSelected(e = None):
+    # save current data
+    SaveData()
+    # refresh display
+    DisplayFunc(mc)
+
 def DisplayFunc(mc):
+    # refresh display
     sglFrame.Refresh(mc)
     msgFrame.Refresh(mc)
 

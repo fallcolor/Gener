@@ -164,15 +164,16 @@ class CanConfig(cm.CanMatrix):
             return True
         return False
 
-    def getSignals(self):
+    def GetSignals(self):
         re = {}
         for fr in self._fl._list:
-            frid = fr._name + ' (' + '%s' % fr._Id + ')'
-            listSignal = []
-            for sgl in fr._signals:
-                strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
-                listSignal.append(strtmp)
-            re[frid] = listSignal
+            if fr._checked:
+                frid = fr._name + ' (' + '%s' % fr._Id + ')'
+                listSignal = []
+                for sgl in fr._signals:
+                    strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
+                    listSignal.append(strtmp)
+                re[frid] = listSignal
         return re
 
 class MapConfig(object):
@@ -241,9 +242,8 @@ class MapConfig(object):
         self.ChangeEcu(dbc)
 
         # message frame configuration
-        self._msgcfgs = []
-        for fr in dbc._fl._list:
-            self.AddMsgConfig(fr._Id, fr._name)
+        self.ChangeMsgConfig(dbc)
+
         # and checked value
 
         # signal map configuration
@@ -281,7 +281,7 @@ class MapConfig(object):
         self._msgcfgs = tmpcfgs
 
         # add new frame
-        for fr in dbc._fl:
+        for fr in dbc._fl._list:
             for mcfg in self._msgcfgs:
                 if mcfg._Id == fr._Id:
                     break
@@ -371,8 +371,13 @@ class MapConfig(object):
         self._cancfg = ccs
         self._msgcfgs = []
         for sc in mcs:
-            self._msgcfgs.append(MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd']\
-                , sc['DLC'], sc['enable'], sc['checked']))
+            msgcfg = MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd']\
+                , sc['DLC'], bool(sc['enable']), bool(sc['checked']))
+            self._msgcfgs.append(msgcfg)
+            # modify the  _checked attribute of dbc frame
+            for fr in self._dbc._fl._list:
+                if msgcfg._Id == fr._Id:
+                    fr._checked = msgcfg._checked
         self._maps = []
         num = 0
         for mp in mps:
@@ -399,12 +404,12 @@ class MapConfig(object):
 class MessageConfig(object):
     '''
     '''
-    def __init__(self, msgid = '', na = '',nd = 2,  prd = 100, tran = False, dlc = 8, en = False, chked = False):
+    def __init__(self, msgid = '', na = '',nd = 2,  prd = 100, dlc = 8, en = False, chked = False):
         self._Id = msgid
         self._name = na
         self._node = nd
         self._prd = prd
-        self._tran = tran
+        self._tran = False
         self._DLC = dlc
         self._enable = en
         self._checked = chked
@@ -414,7 +419,6 @@ class MessageConfig(object):
         self._node = mc._node
         self._prd = mc._prd
         self._tran = mc._tran
-        self._sglfunc = mc._sglfunc
         self._DLC = mc._DLC
         self._IDE = mc._IDE
         self._enable = mc._enable
@@ -433,6 +437,7 @@ class MessageConfig(object):
 
 class SignalMap(object):
     '''
+    signal map. configurate by user.
     '''
     def __init__(self, num, var, sgl = '', st = '', tt = '', uniq = False):
         self._num = num
@@ -456,6 +461,11 @@ class SignalMap(object):
         self._sgltype = ''      # msg name or DI\DO\PWM
         self._transtype = ''    # can or hw IO
         self._uniq = False
+    def IsMaped(self):
+        # whether maped
+        if self._signal and self._sgltype and self._transtype:
+            return True
+        return False
 
 
 def EmptyFunc(ef):
@@ -465,25 +475,25 @@ def printmc(mc):
     print 'App vension is %s' % mc._appver
     print 'Hw vension is %s' % mc._hwver
     print 'Reference ECU are : ', mc._ecu
-    print mc._cancfg
+    print 'can config:', mc._cancfg
+    print 'message config:'
     for mcmc in mc._msgcfgs:
-        print mcmc._ID
-        print mcmc._node
-        print mcmc._prd
-        print mcmc._tran
-        print mcmc._sglfunc
-        print mcmc._DLC
-        print mcmc._IDE
-        print mcmc._enable
-        print mcmc._checked
+        print 'id    :', mcmc._Id
+        print '  node:', mcmc._node
+        print '  prd :', mcmc._prd
+        print '  tran:', mcmc._tran
+        print '  DLC :', mcmc._DLC
+        print '  en  :', mcmc._enable
+        print '  chk :', mcmc._checked
+    print 'Signal maps:'
     for mp in mc._maps:
-        print mp._num
-        print mp._var
-        print mp._type
-        print mp._signal
-        print mp._sgltype
-        print mp._transtype
-        print mp._uniq
+        print 'num   :', mp._num
+        print '  var :', mp._var
+        print '  type:', mp._type
+        print '  sgl :', mp._signal
+        print '  sglt:', mp._sgltype
+        print '  trt :', mp._transtype
+        print '  uniq:', mp._uniq
 
 def test():
     # ac = AppConfig()

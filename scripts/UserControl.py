@@ -114,9 +114,15 @@ class SignalMapControl(Frame):
         self._combo1['value'] = vl
 
     def AddCb2Value(self, vl):
+        vl.sort()
         self._combo2['value'] = vl
 
     def AddCb3Value(self, vl):
+        '''
+        sgl like -- TM_InvTemp (0/16) --, key is 0
+                 -- Bus_Volt (24/16) --, key is 24
+        '''
+        vl.sort(key = lambda sgl: int(sgl.split(' ')[1][1:].split('/')[0]))
         self._combo3['value'] = vl
 
     def EditMap(self, varNum, varType, varName, cb1value = '', cb2value = '', cb3value = '', unk = False):
@@ -243,7 +249,7 @@ class MessageFrameControl(LabelFrame):
         # ecu check valud
         cnt = 0
         for ecu in self._ecuList:
-            chkValue[ecu['text']] = bool(self._chkVar[cnt])
+            chkValue[ecu['text']] = bool(self._chkVar[cnt].get())
             cnt += 1
         for mc in self._mcList:
             tmpstr = mc.GetValue()
@@ -351,14 +357,19 @@ class SignalFrameControl(Frame):
         if mc._hc.IsNotEmpty():
             cb1value.append('Hardware IO')
 
+        mapsingls = mc._dbc.GetSignals()
+
         for vs in mc._maps:
             sm = SignalMapControl(self._cvs, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
-            # print len(mc._dbc._fl._list)
+            
+            # display signal map if maped and has dbc
             if mc._dbc.IsNotEmpty():
-                sm._signals['CAN signal'] = mc._dbc.getSignals()
+                sm._signals['CAN signal'] = mapsingls
                 sm.AddCb1Value(sm._signals.keys())
-                sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
-                sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
+                if sm._combo2.get():
+                    sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
+                if sm._combo3.get():
+                    sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
             self._mapList.append(sm)
             self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mapList[cnt])
 
