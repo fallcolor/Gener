@@ -26,16 +26,14 @@ def GenerateCanCode(mc):
             if ecu in fr._Transmitter:
                 transflag = 1
                 break
-        transstr = ''
-        for tran in fr._Transmitter:
-            transstr += ', ' + tran
-        # if transflag == 1:  # transmit frame            
-        tmpstr = 'can message: ID = 0x%s, Trans ECU(s) is(are): %s'
+        transstr = ', '.join(fr._Transmitter)
+
+        tmpstr = 'can message: ID = %s, Trans ECU(s) is(are): %s'
         func.AddFuncComment(tmpstr % (fr._Id, transstr))
         if transflag == 1:
-            func.AddFuncName('pack_0x%s' % fr._Id)
+            func.AddFuncName('pack_%s' % fr._Id)
         else:
-            func.AddFuncName('unpack_0x%s' % fr._Id)
+            func.AddFuncName('unpack_%s' % fr._Id)
         func.AddFuncPara('char* data')
         func.AddFuncEle(fc.FuncEle(['temp variable'], ['uint32_T tmpValue;']))
         # add signal
@@ -48,7 +46,7 @@ def GenerateCanCode(mc):
                 else:
                     bodylist = cc.UnpackSignal(sm[0], sm[1], 'data', sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)                   
                 func.AddFuncEle(fc.FuncEle(comlist, bodylist))
-
+        
         if len(func._eles) > 1:
             cfile.AddFunc(func)
     return cfile.GetStr()
@@ -56,8 +54,8 @@ def GenerateCanCode(mc):
 def test():
     import ConfigClass as cc
     mc = cc.MapConfig()
-    mc.ImportFromFile(r'E:\pyproj\gener\test\kk.sv')
     mc.AddDbcFromFile(r'E:\pyproj\gener\test\ks.dbc')
+    mc.ImportFromFile(r'E:\pyproj\gener\test\kk.sv')
     print mc._ecu
     print GenerateCanCode(mc)
 

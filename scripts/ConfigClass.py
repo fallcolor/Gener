@@ -151,6 +151,7 @@ class CanConfig(cm.CanMatrix):
                             self._BUs.add(cm.BoardUnit(ele))
 
         for bo in self._fl._list:
+            bo._checked = False
             if bo._Id > 0x80000000:
                 bo._Id -= 0x80000000
                 bo._extended = 1
@@ -162,6 +163,17 @@ class CanConfig(cm.CanMatrix):
         if len(self._fl._list) > 0:
             return True
         return False
+
+    def getSignals(self):
+        re = {}
+        for fr in self._fl._list:
+            frid = fr._name + ' (' + '%s' % fr._Id + ')'
+            listSignal = []
+            for sgl in fr._signals:
+                strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
+                listSignal.append(strtmp)
+            re[frid] = listSignal
+        return re
 
 class MapConfig(object):
     '''
@@ -221,19 +233,59 @@ class MapConfig(object):
     # import data from dbc
     def AddDbcFromFile(self, infile):
         self._dbc.ImportFromFile(infile)
+
         self.AddDbc(self._dbc)
 
-    def AddDbc(self, cc):
+    def AddDbc(self, dbc):
         # ECU selection
-        self._ecu = {}
-        for ecu in cc._BUs._list:       ## if ecu._name in self.ecu.key()
-            self._ecu[ecu._name] = False
+        self.ChangeEcu(dbc)
+
         # message frame configuration
         self._msgcfgs = []
-        for fr in cc._fl._list:
+        for fr in dbc._fl._list:
             self.AddMsgConfig(fr._Id, fr._name)
+        # and checked value
+
+        # signal map configuration
 
         self._displayfunc(self)
+
+    def ChangeEcu(self, dbc):
+        '''
+        refresh the ecu, delete not in dbc, and add new element
+        '''
+        # delete the element in self._ecu but not in dbc
+        tmpdict = {}
+        for ecuname in self._ecu:
+            for ecu in dbc._BUs._list:
+                if ecuname == ecu._name:
+                    tmpdict[ecuname] = self._ecu[ecuname]
+                    break
+        self._ecu = tmpdict
+
+        # add new element in dbc
+        for ecu in dbc._BUs._list:
+            self._ecu.setdefault(ecu._name, False)
+
+    def ChangeMsgConfig(self, dbc):
+        '''
+        refresh the message config, delete not in dbc, and add new element
+        '''
+        tmpcfgs = []
+        # delete the frame in self._ecu but not in dbc
+        for mcfg in self._msgcfgs:
+            for fr in dbc._fl:
+                if mcfg._Id == fr._Id:
+                    tmpcfgs.append(mcfg)
+                    break
+        self._msgcfgs = tmpcfgs
+
+        # add new frame
+        for fr in dbc._fl:
+            for mcfg in self._msgcfgs:
+                if mcfg._Id == fr._Id:
+                    break
+            self.AddMsgConfig(fr._Id, fr._name)
 
     def AddMsgConfig(self, mid, name):
         self._msgcfgs.append(MessageConfig(msgid = mid, na = name))
@@ -265,7 +317,8 @@ class MapConfig(object):
     def GetMaps(self, signal):
         relist = []
         for sv in self._maps:
-            if signal == sv._signal:
+            tmpsgl = sv._signal.split(' ')[0]
+            if signal == tmpsgl:
                 relist.append([sv._var, sv._type])
         return relist
 
@@ -277,6 +330,8 @@ class MapConfig(object):
         self._appver = data['appver']
         self._prj = data['project']
         self._ecu = data['ecu']
+        if self._dbc.IsNotEmpty():
+            self.ChangeEcu(self._dbc)
         self._cancfg = data['canconfig']
         self._msgcfgs = []  # clear last data
         self._maps = []
@@ -332,7 +387,11 @@ class MapConfig(object):
         return re
 
     def CheckSelf(self):
-        return True
+        restr = ''
+        if self._dbc.IsNotEmpty() is not True:
+            restr = 'No dbc!'
+            return False, restr
+        return True, restr
 
     def AddDisplayFunc(self, func):
         self._displayfunc = func
@@ -392,6 +451,11 @@ class SignalMap(object):
         re.append(self._transtype)
         re.append(self._uniq)
         return re
+    def ClearMap(self):
+        self._signal = ''
+        self._sgltype = ''      # msg name or DI\DO\PWM
+        self._transtype = ''    # can or hw IO
+        self._uniq = False
 
 
 def EmptyFunc(ef):

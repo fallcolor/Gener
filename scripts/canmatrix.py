@@ -452,16 +452,16 @@ class CanMatrix(object):
     def boardUnitByName(self, name):
         return self._BUs.byName(name)
 
-    def getSignals(self):
-        re = {}
-        for fr in self._fl._list:
-            frid = fr._name + ' (0x' + '%s' % fr._Id + ')'
-            listSignal = []
-            for sgl in fr._signals:
-                strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
-                listSignal.append(strtmp)
-            re[frid] = listSignal
-        return re
+    # def getSignals(self):
+    #     re = {}
+    #     for fr in self._fl._list:
+    #         frid = fr._name + ' (0x' + '%s' % fr._Id + ')'
+    #         listSignal = []
+    #         for sgl in fr._signals:
+    #             strtmp = sgl._name + " (" + str(sgl._startbit) + '/' + str(sgl._signalsize) + ")"
+    #             listSignal.append(strtmp)
+    #         re[frid] = listSignal
+    #     return re
 
 
 def loadPkl(filename):

@@ -10,7 +10,7 @@ import ttk
 # user module
 import scripts.ConfigClass as cc
 import scripts.UserControl as uc
-import scripts.GeneCanCode as gcc
+import scripts.GenerateCanCode as gcc
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -86,9 +86,12 @@ def GenerateCode():
     SaveData()
     tmpstr = ''
     print len(mc._dbc._fl._list)
-    if mc.CheckSelf():
+    mcstate, errmsg = mc.CheckSelf()
+    if mcstate:
         tmpstr = gcc.GenerateCanCode(mc._dbc, mc, mc.GetTransEcu())
-    print tmpstr
+        print tmpstr
+    else:
+        tkMessageBox.showinfo("Error", errmsg)
 
 
 if __name__ == '__main__':
