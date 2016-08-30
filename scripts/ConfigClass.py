@@ -83,7 +83,8 @@ class HwConfig(object):
 
 class CanConfig(cm.CanMatrix):
     def ImportFromFile(self, infile):
-        dbcImportEncoding='iso-8859-1'
+        dbcImportEncoding = 'iso-8859-1'
+        # dbcImportEncoding = 'utf-8'
         i = 0
 
         f = open(infile, 'rb')
@@ -201,19 +202,6 @@ class MapConfig(object):
         self._dbc = CanConfig()
         self._hc = HwConfig()
 
-    # import data from app config
-    def AddVariables(self, ac):
-        self._appver = ac._version
-        self._prj = ac._prj
-        # self._maps = []
-
-        cnt = 1
-        for var in ac._vars:
-            self._maps.append(SignalMap(cnt, var))
-            cnt += 1
-        self._displayfunc(self)
-
-
     def AddVarsFrmoFile(self, infile):
         '''
         tbc: ChangeVariables
@@ -222,7 +210,54 @@ class MapConfig(object):
         ac.ImportFromFile(infile)
         self.AddVariables(ac)
 
+    # import data from app config
+    def AddVariables(self, ac):
+        self._appver = ac._version
+        self._prj = ac._prj
+        # self._maps = []
+        self.ChangeVariables(ac)
+        # cnt = 0
+        # for var in ac._vars:
+        #     cnt += 1
+        #     self._maps.append(SignalMap(cnt, var))
+        self._displayfunc(self)
+
     def ChangeVariables(self, ac):
+        '''
+        refresh the variable of signal maps
+        '''
+        mpVar = [[mp._var, mp._type] for mp in self._maps]
+        acVar = [acvar for acvar in ac._vars]
+        # delete the element in self._maps but not in app config file
+        tmpmap = []
+        i = 0
+        while i < len(mpVar):
+            mpcnt = mpVar.count(mpVar[i])
+            acvcnt = acVar.count(mpVar[i])
+            if mpcnt < acvcnt:
+                for j in range(mpcnt):
+                    tmpmap.append(self._maps[i + j])
+                for k in range(acvcnt - mpcnt):
+                    tmpmap.append(SignalMap(0, mpVar[i]))
+            elif mpcnt == acvcnt:
+                for j in range(mpcnt):
+                    tmpmap.append(self._maps[j])
+            else:
+                for j in range(acvcnt):
+                    tmpmap.append(SignalMap(0, mpVar[i]))
+            i += mpcnt
+        # add new element in app config
+        i = 0
+        while i < len(acVar):
+            acvcnt = acVar.count(acVar[i])
+            mpcnt = mpVar.count(acVar[i])
+            if mpcnt == 0:
+                for j in range(acvcnt):
+                    tmpmap.append(SignalMap(0, acVar[i + j]))
+            i += acvcnt
+        tmpmap.sort(key = lambda sglmap: sglmap._var)
+        self._maps = tmpmap
+
         # [i for i in li]
         return True
 
@@ -233,8 +268,8 @@ class MapConfig(object):
 
     # import data from dbc
     def AddDbcFromFile(self, infile):
+        self._dbc = CanConfig()
         self._dbc.ImportFromFile(infile)
-
         self.AddDbc(self._dbc)
 
     def AddDbc(self, dbc):
@@ -243,8 +278,6 @@ class MapConfig(object):
 
         # message frame configuration
         self.ChangeMsgConfig(dbc)
-
-        # and checked value
 
         # signal map configuration
 
@@ -274,7 +307,7 @@ class MapConfig(object):
         tmpcfgs = []
         # delete the frame in self._ecu but not in dbc
         for mcfg in self._msgcfgs:
-            for fr in dbc._fl:
+            for fr in dbc._fl._list:
                 if mcfg._Id == fr._Id:
                     tmpcfgs.append(mcfg)
                     break
@@ -340,8 +373,10 @@ class MapConfig(object):
                 , sc['DLC'], sc['enable'], sc['checked']))
         num = 0
         for mp in data['map']:
-            self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
+            self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
+        # self._fl._list.sort(key = lambda Frame: Frame._name)
+        self._maps.sort(key = lambda sglmap: sglmap._var)
         self._displayfunc(self)
 
     def ExportToFile(self, outfile):
@@ -376,13 +411,19 @@ class MapConfig(object):
             self._msgcfgs.append(msgcfg)
             # modify the  _checked attribute of dbc frame
             for fr in self._dbc._fl._list:
-                if msgcfg._Id == fr._Id:
+                # print msgcfg._Id, fr._Id.encode("utf-8"), msgcfg._Id == fr._Id.encode("utf-8")
+                
+                if msgcfg._Id == fr._Id.encode("utf-8"):
                     fr._checked = msgcfg._checked
+                # print msgcfg._checked, fr._checked
+        # print 'msgcfgs: ', [[msgcfg._Id, msgcfg._checked] for msgcfg in self._msgcfgs]
+        # print 'frcheck: ', [[fr._Id, fr._checked] for fr in self._dbc._fl._list]
         self._maps = []
         num = 0
         for mp in mps:
-            self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
             num += 1
+            self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
+        # printmc(self)
 
     def GetTransEcu(self):
         re = []

@@ -51,9 +51,6 @@ class FileDealControl(object):
                         print 'no binding callback function'
                     else:
                         self._callbackFunc(f.name)
-                        
-                else:
-                    print 'Open file failed', f.name
             else:
                 print 'Please add file options.'
 
@@ -357,29 +354,22 @@ class SignalFrameControl(Frame):
         if mc._hc.IsNotEmpty():
             cb1value.append('Hardware IO')
 
-        mapsingls = mc._dbc.GetSignals()
-
+        mapsignals = mc._dbc.GetSignals()
+        print mapsignals
         for vs in mc._maps:
-            sm = SignalMapControl(self._cvs, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
+            sm = SignalMapControl(self._cvs, cnt + 1, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
             
             # display signal map if maped and has dbc
-            if mc._dbc.IsNotEmpty():
-                sm._signals['CAN signal'] = mapsingls
+            if mapsignals:
+                # if mc._dbc.IsNotEmpty():
+                sm._signals['CAN signal'] = mapsignals
                 sm.AddCb1Value(sm._signals.keys())
-                if sm._combo2.get():
-                    sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
-                if sm._combo3.get():
-                    sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
+                # if sm._combo1.get():
+                #     sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
+                # if sm._combo2.get():
+                #     sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
             self._mapList.append(sm)
             self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mapList[cnt])
-
-            # if cnt == len(self._mapList):
-            #     print vs._num, vs._type,'a', vs._var,'b', vs._transtype,'c', vs._sgltype,'c', vs._signal
-            #     sm = SignalMapControl(self, vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
-            #     self._mapList.append(sm)
-            # else:
-            #     self._mapList[cnt].EditMap(vs._num, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
-            # self._mapList[cnt].pack()
             cnt += 1
         self._cvs['scrollregion'] = (0, 0, 800, cnt * 30)
 

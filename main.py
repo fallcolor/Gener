@@ -61,7 +61,7 @@ def StartGui():
 
     fr = Frame(root)
     fr.pack(fill = X)
-    saveBtn = Button(fr, text = "save sv file", command = SaveData)
+    saveBtn = Button(fr, text = "save config", command = SaveData)
     saveBtn.pack(side = LEFT)
     geneBtn = Button(fr, text = "generate code", command = GenerateCode)
     geneBtn.pack(side = LEFT)
@@ -84,7 +84,9 @@ def DisplayFunc(mc):
 def SaveData():
     ecuchks, msgcfgs = msgFrame.GetValue()
     sglmaps = sglFrame.GetValue()
+    print 'main cfg: ', msgcfgs
     mc.ChangeFromFrame(ecuchks, mc._cancfg, msgcfgs, sglmaps)
+    print 'main mc: ', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
 
 def ipdbc(infile):
     mc.AddDbcFromFile(infile)
