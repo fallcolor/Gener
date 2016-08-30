@@ -355,7 +355,7 @@ class SignalFrameControl(Frame):
             cb1value.append('Hardware IO')
 
         mapsignals = mc._dbc.GetSignals()
-        print mapsignals
+        # print mapsignals
         for vs in mc._maps:
             sm = SignalMapControl(self._cvs, cnt + 1, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
             
@@ -364,8 +364,8 @@ class SignalFrameControl(Frame):
                 # if mc._dbc.IsNotEmpty():
                 sm._signals['CAN signal'] = mapsignals
                 sm.AddCb1Value(sm._signals.keys())
-                # if sm._combo1.get():
-                #     sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
+                if sm._combo1.get():
+                    sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
                 # if sm._combo2.get():
                 #     sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
             self._mapList.append(sm)

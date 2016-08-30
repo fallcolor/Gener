@@ -84,9 +84,9 @@ def DisplayFunc(mc):
 def SaveData():
     ecuchks, msgcfgs = msgFrame.GetValue()
     sglmaps = sglFrame.GetValue()
-    print 'main cfg: ', msgcfgs
+    # print 'main cfg: ', msgcfgs
     mc.ChangeFromFrame(ecuchks, mc._cancfg, msgcfgs, sglmaps)
-    print 'main mc: ', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
+    # print 'main mc: ', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
 
 def ipdbc(infile):
     mc.AddDbcFromFile(infile)

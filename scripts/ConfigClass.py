@@ -316,7 +316,8 @@ class MapConfig(object):
         # add new frame
         for fr in dbc._fl._list:
             for mcfg in self._msgcfgs:
-                if mcfg._Id == fr._Id:
+                print '  ChangeMsgConfig:', mcfg._Id, fr._Id, fr._Id.encode("utf-8")
+                if mcfg._Id == fr._Id.encode("utf-8"):
                     break
             self.AddMsgConfig(fr._Id, fr._name)
 
