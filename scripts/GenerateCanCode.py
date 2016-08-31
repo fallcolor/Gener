@@ -13,6 +13,13 @@ import FileClass as fc
 def GenerateCanCode(mc):
     cfile = fc.SourceFile()
     hfile = fc.SourceFile()
+    cname = mc._svfname[:-2] + 'c'
+    cname = cname.split('/')[-1]
+    hname = mc._svfname[:-2] + 'h'
+    hname = hname.split('/')[-1]
+    cfile.AddFilehead(cname, 'pk', 'source file for CAN message init and signal task')
+    hfile.AddFilehead(hname, 'pk', 'head file for CAN message init and signal task')
+
     for fr in mc._dbc._fl._list:
         transflag = 0
         func = fc.FuncBody()
@@ -40,7 +47,7 @@ def GenerateCanCode(mc):
         for sgl in fr._signals:
             sglmaps = mc.GetMaps(sgl._name)
             for sm in sglmaps:
-                comlist = cc.GetSignalComm(sm[0], sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
+                comlist = cc.GetSignalComm(sm[0], sm[2].split(' ')[0], sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
                 if transflag == 1:
                     bodylist = cc.PackSignal(sm[0], sm[1], 'data', sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
                 else:
@@ -49,7 +56,7 @@ def GenerateCanCode(mc):
         
         if len(func._eles) > 1:
             cfile.AddFunc(func)
-    return cfile.GetStr()
+    return cfile.GetStr(), hfile.GetStr()
 
 def test():
     import ConfigClass as cc

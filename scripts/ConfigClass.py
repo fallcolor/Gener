@@ -201,6 +201,7 @@ class MapConfig(object):
         self._displayfunc = EmptyFunc
         self._dbc = CanConfig()
         self._hc = HwConfig()
+        self._svfname = ''
 
     def AddVarsFrmoFile(self, infile):
         '''
@@ -214,12 +215,9 @@ class MapConfig(object):
     def AddVariables(self, ac):
         self._appver = ac._version
         self._prj = ac._prj
-        # self._maps = []
+
         self.ChangeVariables(ac)
-        # cnt = 0
-        # for var in ac._vars:
-        #     cnt += 1
-        #     self._maps.append(SignalMap(cnt, var))
+
         self._displayfunc(self)
 
     def ChangeVariables(self, ac):
@@ -228,6 +226,7 @@ class MapConfig(object):
         '''
         mpVar = [[mp._var, mp._type] for mp in self._maps]
         acVar = [acvar for acvar in ac._vars]
+
         # delete the element in self._maps but not in app config file
         tmpmap = []
         i = 0
@@ -241,11 +240,12 @@ class MapConfig(object):
                     tmpmap.append(SignalMap(0, mpVar[i]))
             elif mpcnt == acvcnt:
                 for j in range(mpcnt):
-                    tmpmap.append(self._maps[j])
+                    tmpmap.append(self._maps[i + j])
             else:
                 for j in range(acvcnt):
                     tmpmap.append(SignalMap(0, mpVar[i]))
             i += mpcnt
+
         # add new element in app config
         i = 0
         while i < len(acVar):
@@ -257,9 +257,6 @@ class MapConfig(object):
             i += acvcnt
         tmpmap.sort(key = lambda sglmap: sglmap._var)
         self._maps = tmpmap
-
-        # [i for i in li]
-        return True
 
     # import data from hardware
     def ChangeHwConfig(self, hc):
@@ -273,6 +270,7 @@ class MapConfig(object):
         self.AddDbc(self._dbc)
 
     def AddDbc(self, dbc):
+        # print 'call adddbc()'
         # ECU selection
         self.ChangeEcu(dbc)
 
@@ -305,21 +303,19 @@ class MapConfig(object):
         refresh the message config, delete not in dbc, and add new element
         '''
         tmpcfgs = []
-        # delete the frame in self._ecu but not in dbc
+        # delete the frame in self._msgcfgs but not in dbc
         for mcfg in self._msgcfgs:
             for fr in dbc._fl._list:
                 if mcfg._Id == fr._Id:
                     tmpcfgs.append(mcfg)
                     break
         self._msgcfgs = tmpcfgs
-
         # add new frame
         for fr in dbc._fl._list:
-            for mcfg in self._msgcfgs:
-                print '  ChangeMsgConfig:', mcfg._Id, fr._Id, fr._Id.encode("utf-8")
-                if mcfg._Id == fr._Id.encode("utf-8"):
-                    break
-            self.AddMsgConfig(fr._Id, fr._name)
+            containId = [mcfg._Id for mcfg in self._msgcfgs]
+            if fr._Id not in containId:
+                self.AddMsgConfig(fr._Id, fr._name)
+        self._msgcfgs.sort(key = lambda mcfg: mcfg._name)
 
     def AddMsgConfig(self, mid, name):
         self._msgcfgs.append(MessageConfig(msgid = mid, na = name))
@@ -338,8 +334,10 @@ class MapConfig(object):
                 return True
         return False
 
-    # map of signal and variable
     def EditMap(self, num, sgl, st, tt, uniq):
+        '''
+        map of signal and variable
+        '''
         for mp in self._maps:
             if mp._num == num:
                 self._signal = sgl
@@ -348,12 +346,13 @@ class MapConfig(object):
                 self._uniq = uniq
                 return True
         return False
+
     def GetMaps(self, signal):
         relist = []
         for sv in self._maps:
             tmpsgl = sv._signal.split(' ')[0]
             if signal == tmpsgl:
-                relist.append([sv._var, sv._type])
+                relist.append([sv._var, sv._type, sv._signal])
         return relist
 
     def ImportFromFile(self, infile):
@@ -380,7 +379,10 @@ class MapConfig(object):
         self._maps.sort(key = lambda sglmap: sglmap._var)
         self._displayfunc(self)
 
-    def ExportToFile(self, outfile):
+    def GetSvFilePath(self, outfile):
+        self._svfname = outfile
+
+    def ExportSvToFile(self):
         data = {}
         data['time'] = self._time
         data['hwver'] = self._hwver
@@ -395,7 +397,7 @@ class MapConfig(object):
         for mp in self._maps:
             data['map'].append(mp.GetValue())
         try:
-            f = open(outfile, 'w')
+            f = open(self._svfname, 'w')
             f.write(json.dumps(data, indent = 4))
             f.close()
             print 'success for generated json file!'
@@ -406,25 +408,23 @@ class MapConfig(object):
         self._ecu = ecus
         self._cancfg = ccs
         self._msgcfgs = []
+
         for sc in mcs:
             msgcfg = MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd']\
                 , sc['DLC'], bool(sc['enable']), bool(sc['checked']))
             self._msgcfgs.append(msgcfg)
             # modify the  _checked attribute of dbc frame
+            cnt = 0
             for fr in self._dbc._fl._list:
-                # print msgcfg._Id, fr._Id.encode("utf-8"), msgcfg._Id == fr._Id.encode("utf-8")
-                
-                if msgcfg._Id == fr._Id.encode("utf-8"):
-                    fr._checked = msgcfg._checked
-                # print msgcfg._checked, fr._checked
-        # print 'msgcfgs: ', [[msgcfg._Id, msgcfg._checked] for msgcfg in self._msgcfgs]
-        # print 'frcheck: ', [[fr._Id, fr._checked] for fr in self._dbc._fl._list]
+                if msgcfg._Id == fr._Id:
+                    self._dbc._fl._list[cnt]._checked = msgcfg._checked
+                cnt += 1
+
         self._maps = []
         num = 0
         for mp in mps:
             num += 1
             self._maps.append(SignalMap(num, [mp[0], mp[1]], mp[2], mp[3], mp[4], mp[5]))
-        # printmc(self)
 
     def GetTransEcu(self):
         re = []
@@ -434,11 +434,69 @@ class MapConfig(object):
         return re
 
     def CheckSelf(self):
-        restr = ''
+        '''
+        whether data right
+        '''
+        # dbc
         if self._dbc.IsNotEmpty() is not True:
             restr = 'No dbc!'
+            return False, 'No dbc!'
+
+        # file name
+        if self._svfname == '':
+            restr = 'No file name!'
+            return False, 'No file name!'
+        
+        # all variable-signal map done
+        iserr, restr = self.IsMapConfigNotDone()
+        if iserr:
             return False, restr
-        return True, restr
+
+        # signal select contained by self._dbc and self._hc
+        iserr, restr = self.IsMapSglContained()
+        if iserr:
+            return False, restr
+
+        return True, ''
+
+    def IsMapConfigNotDone(self):
+        iserror = False
+        restr = ''
+        for mp in self._maps:
+            if mp.IsMapDone() == False:
+                iserror = True
+                restr += str(mp._num) + '  ' + mp._var + '\n' 
+        if iserror:
+            restr = 'The following vars map not done!\n' + restr
+            return True, restr
+        else:
+            return False, restr
+
+    def IsMapSglContained(self):
+        iserror = False
+        refreshreq = False
+        restr = 'The following signal of map not in dbc or the message frame not chedked\n'
+        signals = {}
+        signals['CAN signal'] = self._dbc.GetSignals()
+        # signals['Hareware IO']
+
+        for i in range(len(self._maps)):
+            bcontain, bframe = self._maps[i].IsMapWell(signals)
+
+            if bcontain == False:
+                iserror = True
+                restr += str(self._maps[i]._num) + '  ' + self._maps[i]._var +'\n'
+            else:
+                if bframe == False:
+                    refreshreq = True
+        if refreshreq:
+            self._displayfunc(self)
+
+        if iserror:
+            return True, restr
+        else:
+            return False, ''
+
 
     def AddDisplayFunc(self, func):
         self._displayfunc = func
@@ -503,11 +561,30 @@ class SignalMap(object):
         self._sgltype = ''      # msg name or DI\DO\PWM
         self._transtype = ''    # can or hw IO
         self._uniq = False
-    def IsMaped(self):
+    def IsMapDone(self):
         # whether maped
-        if self._signal and self._sgltype and self._transtype:
-            return True
-        return False
+        if self._signal == '' or self._sgltype == '' or self._transtype == '':
+            return False
+        return True
+
+    def IsMapWell(self, sgls):
+        '''
+        mapped signal contained by signals
+        '''
+        # dbc
+        if self._transtype == 'CAN signal':
+            for fr in sgls['CAN signal']:
+                if self._signal in sgls['CAN signal'][fr]:
+                    if self._sgltype == fr:
+                        # signal contained, and the same frame name
+                        return True, True
+                    else:
+                        # signal contained, but different frame name, change it
+                        self._sgltype = fr
+                        return True, False
+        return False, False
+
+
 
 
 def EmptyFunc(ef):

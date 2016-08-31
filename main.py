@@ -22,16 +22,8 @@ def StartGui():
     root.geometry('800x600+100+20')
 
     mc = cc.MapConfig()
-    # dbc = cc.CanConfig()
-    # hc = cc.HwConfig()
 
-    nb = ttk.Notebook(root)
-    nb.bind('<<NotebookTabChanged>>', NoteBookSelected)
-    msgFrame = uc.MessageFrameControl(nb, height = 20, width = 30)
-    sglFrame = uc.SignalFrameControl(nb, height = 20, width = 30)
-    nb.add(msgFrame, text = 'Basic config')
-    nb.add(sglFrame, text = 'Signal Map')
-    mc.AddDisplayFunc(DisplayFunc)
+    
 
     # message frmae
 
@@ -55,7 +47,7 @@ def StartGui():
     insv.ConfigOpen('data for sv', '.sv', 'Open sv')
     insv.pack()
 
-    outsv = uc.FileDealControl(root, cbfunc = mc.ExportToFile, inText = 'Output sv file', save = True)
+    outsv = uc.FileDealControl(root, cbfunc = mc.GetSvFilePath, inText = 'Output sv file', save = True)
     outsv.ConfigOpen('data for sv', '.sv', 'Save sv')
     outsv.pack()
 
@@ -66,6 +58,13 @@ def StartGui():
     geneBtn = Button(fr, text = "generate code", command = GenerateCode)
     geneBtn.pack(side = LEFT)
 
+    nb = ttk.Notebook(root)
+    nb.bind('<<NotebookTabChanged>>', NoteBookSelected)
+    msgFrame = uc.MessageFrameControl(nb, height = 20, width = 30)
+    sglFrame = uc.SignalFrameControl(nb, height = 20, width = 30)
+    nb.add(msgFrame, text = 'Basic config')
+    nb.add(sglFrame, text = 'Signal Map')
+    mc.AddDisplayFunc(DisplayFunc)
     nb.pack(fill = BOTH, expand = 1, side = BOTTOM)
     
     root.mainloop()
@@ -76,17 +75,15 @@ def NoteBookSelected(e = None):
     # refresh display
     DisplayFunc(mc)
 
-def DisplayFunc(mc):
+def DisplayFunc(mapcfg):
     # refresh display
-    sglFrame.Refresh(mc)
-    msgFrame.Refresh(mc)
+    sglFrame.Refresh(mapcfg)
+    msgFrame.Refresh(mapcfg)
 
 def SaveData():
     ecuchks, msgcfgs = msgFrame.GetValue()
     sglmaps = sglFrame.GetValue()
-    # print 'main cfg: ', msgcfgs
     mc.ChangeFromFrame(ecuchks, mc._cancfg, msgcfgs, sglmaps)
-    # print 'main mc: ', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
 
 def ipdbc(infile):
     mc.AddDbcFromFile(infile)
@@ -94,12 +91,26 @@ def ipdbc(infile):
 
 def GenerateCode():
     SaveData()
-    tmpstr = ''
-    print len(mc._dbc._fl._list)
+    tmpcstr = ''
+    tmphstr = ''
     mcstate, errmsg = mc.CheckSelf()
     if mcstate:
-        tmpstr = gcc.GenerateCanCode(mc._dbc, mc, mc.GetTransEcu())
-        print tmpstr
+        # save .sv file
+        mc.ExportSvToFile()
+        # save .c and .h file
+        tmpcstr, tmphstr = gcc.GenerateCanCode(mc)
+        cfilepath = mc._svfname[:-2] + 'c'
+        hfilepath = mc._svfname[:-2] + 'h'
+        try:
+            f = open(cfilepath, 'w')
+            f.write(tmpcstr)
+            f.close()
+            f = open(hfilepath, 'w')
+            f.write(tmphstr)
+            f.close()
+            print 'success for generated source file!'
+        except Exception, e:
+            print Exception,":",e
     else:
         tkMessageBox.showinfo("Error", errmsg)
 

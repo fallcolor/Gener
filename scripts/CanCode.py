@@ -13,13 +13,14 @@ interface function, they all return a list:
 
 from math import pow
 
-def GetSignalComm(sglName, startbit, length, factor, offset):
+def GetSignalComm(varName, sglName, startbit, length, factor, offset):
     relist = []
-    relist.append('value name : %s' % sglName)
-    relist.append('start bit  : %s' % startbit)
-    relist.append('length     : %s' % length)
-    relist.append('factor     : %s' % factor)
-    relist.append('offset     : %s' % offset)
+    relist.append('value name  : %s' % varName)
+    relist.append('signal name : %s' % sglName)
+    relist.append('start bit   : %s' % startbit)
+    relist.append('length      : %s' % length)
+    relist.append('factor      : %s' % factor)
+    relist.append('offset      : %s' % offset)
     return relist
 
 def PackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):

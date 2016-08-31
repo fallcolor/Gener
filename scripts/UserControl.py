@@ -32,8 +32,8 @@ class FileDealControl(object):
         if self._save:
             if self._fileOption.has_key('title'):
                 f = tkFileDialog.asksaveasfilename(**self._fileOption)
-                print f
                 if f:
+                    self._label['text'] = f
                     if self._callbackFunc == None:
                         print 'no binding callback function'
                     else:
@@ -354,6 +354,7 @@ class SignalFrameControl(Frame):
         if mc._hc.IsNotEmpty():
             cb1value.append('Hardware IO')
 
+        # print 'mc', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
         mapsignals = mc._dbc.GetSignals()
         # print mapsignals
         for vs in mc._maps:
@@ -366,6 +367,8 @@ class SignalFrameControl(Frame):
                 sm.AddCb1Value(sm._signals.keys())
                 if sm._combo1.get():
                     sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
+                if sm._combo2.get() in sm._signals[sm._combo1.get()].keys():
+                    sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
                 # if sm._combo2.get():
                 #     sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
             self._mapList.append(sm)

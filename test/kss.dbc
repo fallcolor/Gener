@@ -86,7 +86,12 @@ BO_ 2557726930 BMS_CellVoltage: 8 BMS
  SG_ BAT_MaxVoltCellNo : 16|5@1+ (1,0) [0.0|31.0] "" 
  SG_ BAT_MaxCellVolt : 0|16@1+ (0.001,0) [0.0|5.0] "V" 
 
-
+BO_ 2356269260 BMS_Voltage2: 8 BMS
+ SG_ BAT_Volt : 0|16@1+ (0.015,0) [0.0|979.995] "V" 
+ SG_ BAT_SOH : 40|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_SOC : 32|8@1+ (0.4,0) [0.0|100.0] "%" 
+ SG_ BAT_Curr : 16|16@1+ (0.05,-500) [0.0|1000.0] "A" 
+ SG_ BAT_AvgCellVolt : 48|16@1+ (0.001,0) [0.0|5.0] "V" 
 
 
 

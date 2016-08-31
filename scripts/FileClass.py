@@ -32,10 +32,10 @@ class FileHead(object):
         self._descrip = descrip
     def GetList(self):
         tmplist = []
-        tmplist.append(CommentStr('file name   :' + self._filename).GetStr())
-        tmplist.append(CommentStr('author      :' + self._author).GetStr())
-        tmplist.append(CommentStr('time        :' + self._time).GetStr())
-        tmplist.append(CommentStr('description :' + self._descrip).GetStr())
+        tmplist.append(CommentStr('file name   : ' + self._filename).GetStr())
+        tmplist.append(CommentStr('author      : ' + self._author).GetStr())
+        tmplist.append(CommentStr('time        : ' + self._time).GetStr())
+        tmplist.append(CommentStr('description : ' + self._descrip).GetStr())
         return tmplist
 
 class FileInclud(object):
@@ -71,9 +71,14 @@ class FuncEle(object):
         return tmplist
 
 class FuncBody(object):
-    def __init__(self):
-        self._para = 'void'
+    def __init__(self, para = 'void', retype = 'void', reval = '', called = False, declare = False):
+        self._para = para
         self._eles = []
+        self._retype = retype
+        self._reVal = reval
+        self._called = called
+        self._declare = declare
+
     def AddFuncName(self, name):
         self._name = name
     def AddFuncComment(self, commstr):
@@ -83,11 +88,20 @@ class FuncBody(object):
     def AddFuncEle(self, ele):
         self._eles.append(ele)
     def GetList(self, inden = 4):
+        if self._declare:
+            return self.GetDeclareList()
+
+        if self._called:
+            return self.GetCalledList()
+        else:
+            return self.GetNotCalledList()
+
+    def GetNotCalledList(self, inden = 4):
         tmplist = []
         # function comment
         tmplist.append(self._comment)
         # function name
-        tmplist.append('void ' + self._name + '(' + self._para + ')')
+        tmplist.append(self._retype + ' ' + self._name + '(' + self._para + ')')
         tmplist.append('{')
         # function elements
         for li in self._eles:
@@ -95,6 +109,24 @@ class FuncBody(object):
         tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
         # function end
         tmplist.append('}')
+        return tmplist
+    def GetCalledList(self, inden = 4):
+        tmplist = []
+        tmplist.append(' ' * inden + self._comment)
+        tmpstr = ''
+        if self._reVal != '':
+            tmpstr += self._reVal + ' '
+        tmpstr += self._name + '(' + self._para + ');\n'
+        tmplist.append(' ' * inden + tmpstr)
+        return tmplist
+    def GetDeclareList(self):
+        tmplist = []
+        tmplist.append(self._comment)
+        tmpstr = 'extern '
+        if self._retype != '':
+            tmpstr += self._retype + ' '
+        tmpstr += self._name + '(' + self._para + ');'
+        tmplist.append(tmpstr)
         return tmplist
 
 class SourceFile(object):
@@ -128,12 +160,24 @@ def test():
     sf.AddFilehead('main.c','pk','ok')
     sf.AddFileInclude(['stdio.h', 'math.h'])
 
+    fd = FuncBody(declare = True, retype = 'int')
+    fd.AddFuncComment('fd')
+    fd.AddFuncName('func_declare')
+    fd.AddFuncPara('sdfsf, ifef, ds9ff')
+    sf.AddFunc(fd)
+
+    f0 = FuncBody(called = True)
+    f0.AddFuncComment('f0')
+    f0.AddFuncName('initsdfsdf')
+    f0.AddFuncPara('sdfsf, ifef, ds9ff')
+
     f1 = FuncBody()
     f1.AddFuncComment('f1')
     f1.AddFuncName('unpack0x1313FF01')
     f1.AddFuncPara('char* data, int num')
     f1.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
     f1.AddFuncEle(FuncEle(['signalname', 'startbit','leng'], ['busvolt = data[0];']))
+    f1.AddFuncEle(f0)
     sf.AddFunc(f1)
 
     f2 = FuncBody()
@@ -141,7 +185,7 @@ def test():
     f2.AddFuncName('unpack0x1313FF01')
     f2.AddFuncPara('char* data, int num')
     f2.AddFuncEle(FuncEle(['temp variable'], ['uint32_T utmp;','int32_T itmp;']))
-    f2.AddFuncEle(FuncEle(cc.GetSignalComm('bat', 20, 16, 0.1, -40), cc.UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)))
+    f2.AddFuncEle(FuncEle(cc.GetSignalComm('bat', 'BAT..', 20, 16, 0.1, -40), cc.UnpackSignal('bat', 'int', 'data', 20, 16, 0.1, -40)))
     sf.AddFunc(f2)
     print len(sf._funclist)
     print sf.GetStr()
