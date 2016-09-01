@@ -48,7 +48,6 @@ def GenerateCanCode(mc):
             else:
                 para += ', unpack_%s' % msg._Id
 
-            
             func.AddFuncPara(para)
             initfunc.AddFuncEle(func)
     cfile.AddFunc(initfunc)
@@ -107,6 +106,7 @@ def GenerateCanCode(mc):
         # if len(func._eles) > 1:
         if fr._checked:
             cfile.AddFunc(func)
+
             hfunc = fc.FuncBody()
             hfunc.CopyFromAnother(func)
             hfunc._declare = True
