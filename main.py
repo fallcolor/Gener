@@ -72,13 +72,22 @@ def StartGui():
 def NoteBookSelected(e = None):
     # save current data
     SaveData()
+    nbtab = nb.tabs()
+    if nb.select() == nbtab[0]:
+        mc._page = 0      # message config page
+    else:
+        mc._page = 1      # signal config page
     # refresh display
     DisplayFunc(mc)
 
 def DisplayFunc(mapcfg):
     # refresh display
-    sglFrame.Refresh(mapcfg)
-    msgFrame.Refresh(mapcfg)
+    if mc._page == 0:
+        sglFrame.Refresh(mapcfg)
+        msgFrame.Refresh(mapcfg)
+    else:
+        msgFrame.Refresh(mapcfg)
+        sglFrame.Refresh(mapcfg)
 
 def SaveData():
     ecuchks, msgcfgs = msgFrame.GetValue()

@@ -4,6 +4,19 @@
     "var": [
         ["Bat.BusVolt", "float"],
         ["Bat.BusVolt", "float"],
-        ["Bat.SOC", "float"]
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"],
+        ["Bat.SOC", "int8_T"]
     ]
 }

@@ -165,6 +165,14 @@ class CanConfig(cm.CanMatrix):
             return True
         return False
 
+    def IsTransmit(self, msgid, eculist):
+        for fr in self._fl._list:
+            if msgid == fr._Id:
+                for ecu in eculist:
+                    if ecu in fr._Transmitter:
+                        return True
+        return False
+
     def GetSignals(self):
         re = {}
         for fr in self._fl._list:
@@ -202,6 +210,7 @@ class MapConfig(object):
         self._dbc = CanConfig()
         self._hc = HwConfig()
         self._svfname = ''
+        self._page = 0
 
     def AddVarsFrmoFile(self, infile):
         '''
@@ -407,11 +416,17 @@ class MapConfig(object):
     def ChangeFromFrame(self, ecus, ccs, mcs, mps):
         self._ecu = ecus
         self._cancfg = ccs
-        self._msgcfgs = []
 
+        self._msgcfgs = []
         for sc in mcs:
             msgcfg = MessageConfig(sc['ID'], sc['name'], sc['node'], sc['prd']\
                 , sc['DLC'], bool(sc['enable']), bool(sc['checked']))
+            # modify the  _checked attribute of dbc frame
+            # for fr in self._dbc._fl._list:
+            #     if msgcfg._Id == fr._Id:
+            #         msgcfg._checked = msgcfg._checked
+            # modify the _tran attribute of dbc frame
+            msgcfg._tran = self._dbc.IsTransmit(msgcfg._Id, self.GetTransEcu())
             self._msgcfgs.append(msgcfg)
             # modify the  _checked attribute of dbc frame
             cnt = 0
@@ -419,6 +434,9 @@ class MapConfig(object):
                 if msgcfg._Id == fr._Id:
                     self._dbc._fl._list[cnt]._checked = msgcfg._checked
                 cnt += 1
+            
+
+        
 
         self._maps = []
         num = 0

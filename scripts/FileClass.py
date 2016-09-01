@@ -106,7 +106,8 @@ class FuncBody(object):
         # function elements
         for li in self._eles:
             tmplist.extend(li.GetList(inden))
-        tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
+        if len(self._eles) > 0:
+            tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
         # function end
         tmplist.append('}')
         return tmplist

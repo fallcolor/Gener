@@ -144,25 +144,6 @@ class SignalMapControl(Frame):
         re.append(self._unique)
         return re
 
-    # def forget(self):
-    #     self._lf.forget()
-    #     self._num.forget()
-    #     self._type.forget()
-    #     self._var.forget()
-    #     self._combo1.forget()
-    #     self._combo2.forget()
-    #     self._combo3.forget()
-    #     # self.forget()
-
-    # def pack(self):
-    #     self._lf.pack(fill = X)
-    #     self._num.pack(side = LEFT)
-    #     self._type.pack(side = LEFT)
-    #     self._var.pack(side = LEFT)
-    #     self._combo1.pack(side = LEFT)
-    #     self._combo2.pack(side = LEFT)
-    #     self._combo3.pack(side = LEFT)
-
 class MessageConfigControl(Frame):
     def __init__(self, parent, *arg, **karg):
         Frame.__init__(self, parent, **karg)
@@ -201,7 +182,6 @@ class MessageConfigControl(Frame):
         self._enable.pack(side = LEFT, padx = 8)
 
     def MessageChecked(self):
-        self._DLCVar.set(self._chkVar.get())
         if self._chkVar.get() == 0:
             self._node['bg'] = 'gray'
             self._prd['bg'] = 'gray'
@@ -261,9 +241,10 @@ class MessageFrameControl(LabelFrame):
             mcValue.append(tmp)
         return chkValue, mcValue
 
+    def ProcessWheel(self, event):
+        self._cvs.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def Refresh(self, mc):
-        # check button
         cnt = 0
         if self._chkFrm is None:
             self._chkFrm = LabelFrame(self, text = 'Select Tx ECU')
@@ -305,19 +286,22 @@ class MessageFrameControl(LabelFrame):
             self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
             self._cvs['yscrollcommand'] = self._sb.set
             self._sb['command'] = self._cvs.yview
+        if mc._page == 0:
+            self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
+        else:
+            self._cvs.unbind_all("<MouseWheel>")
         cnt = 0
         self._cvs.delete('all')
         self._mcList = []
 
         for msgcfg in mc._msgcfgs:
-            # if cnt == len(self._mcList):
             self._mcList.append(MessageConfigControl(self._cvs, cnt + 1, msgcfg._Id, msgcfg._name))
             self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
             self._cvs.create_window(0, cnt * 30, anchor = NW, window = self._mcList[cnt])
-            # else:
-            #     self._mcList[cnt].ChangeValue(cnt + 1, msgcfg._Id, msgcfg._name, msgcfg._node, msgcfg._prd, msgcfg._DLC, msgcfg._enable, msgcfg._checked)
             cnt += 1
         self._cvs['scrollregion'] = (0, 0, 800, cnt * 30)
+
+
 
 class SignalFrameControl(Frame):
     def __init__(self, ro, **kwArg):
@@ -330,8 +314,10 @@ class SignalFrameControl(Frame):
             re.append(sm.GetMap())
         return re
 
+    def ProcessWheel(self, event):
+        self._cvs.yview_scroll(int(-1*(event.delta/120)), "units")
+
     def Refresh(self, mc):
-        
         if self._smFrm is None:
             self._smFrm = LabelFrame(self)
             self._smFrm.pack(fill = BOTH, expand=True)
@@ -342,6 +328,10 @@ class SignalFrameControl(Frame):
             self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
             self._cvs['yscrollcommand'] = self._sb.set
             self._sb['command'] = self._cvs.yview
+        if mc._page == 1:
+            self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
+        else:
+            self._cvs.unbind_all("<MouseWheel>")
         cnt = 0
         self._cvs.delete('all')
         self._mapList = []
@@ -354,23 +344,19 @@ class SignalFrameControl(Frame):
         if mc._hc.IsNotEmpty():
             cb1value.append('Hardware IO')
 
-        # print 'mc', [[fr._Id, fr._checked] for fr in mc._dbc._fl._list]
         mapsignals = mc._dbc.GetSignals()
-        # print mapsignals
         for vs in mc._maps:
             sm = SignalMapControl(self._cvs, cnt + 1, vs._type, vs._var, vs._transtype, vs._sgltype, vs._signal)
             
             # display signal map if maped and has dbc
             if mapsignals:
-                # if mc._dbc.IsNotEmpty():
                 sm._signals['CAN signal'] = mapsignals
                 sm.AddCb1Value(sm._signals.keys())
-                if sm._combo1.get():
+                if sm._combo1.get() != '':
                     sm.AddCb2Value(sm._signals[sm._combo1.get()].keys())
-                if sm._combo2.get() in sm._signals[sm._combo1.get()].keys():
-                    sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
-                # if sm._combo2.get():
-                #     sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
+                    if sm._combo2.get() in sm._signals[sm._combo1.get()].keys():
+                        sm.AddCb3Value(sm._signals[sm._combo1.get()][sm._combo2.get()])
+                
             self._mapList.append(sm)
             self._cvs.create_window(2, cnt * 30, anchor = NW, window = self._mapList[cnt])
             cnt += 1
