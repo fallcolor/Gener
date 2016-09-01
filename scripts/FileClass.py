@@ -78,6 +78,8 @@ class FuncBody(object):
         self._reVal = reval
         self._called = called
         self._declare = declare
+        self._comment = ''
+        self._name = ''
 
     def AddFuncName(self, name):
         self._name = name
@@ -87,6 +89,16 @@ class FuncBody(object):
         self._para = Arg
     def AddFuncEle(self, ele):
         self._eles.append(ele)
+    def CopyFromAnother(self, func):
+        self._para = func._para
+        self._eles = func._eles
+        self._retype = func._retype
+        self._reVal = func._reVal
+        self._called = func._called
+        self._declare = func._declare
+        self._comment = func._comment
+        self._name = func._name
+        self._eles = func._eles
     def GetList(self, inden = 4):
         if self._declare:
             return self.GetDeclareList()
@@ -95,7 +107,6 @@ class FuncBody(object):
             return self.GetCalledList()
         else:
             return self.GetNotCalledList()
-
     def GetNotCalledList(self, inden = 4):
         tmplist = []
         # function comment
@@ -106,7 +117,8 @@ class FuncBody(object):
         # function elements
         for li in self._eles:
             tmplist.extend(li.GetList(inden))
-        tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
+        if len(self._eles) > 0:
+            tmplist[-1] = tmplist[-1][:-1]  # delete the last '\n'
         # function end
         tmplist.append('}')
         return tmplist
@@ -130,26 +142,39 @@ class FuncBody(object):
         return tmplist
 
 class SourceFile(object):
-    def __init__(self):
+    def __init__(self, declare = False):
         self._indentationNum = 4    
         self._filehead = FileHead()
         self._fileinclude = FileInclud()
         self._funclist = []
+        self._declare = declare
+        self._filename = ''
     def AddFilehead(self, filename = '', author = 'pk', descrip = ''):
+        self._filename = filename
         self._filehead.AddProperty(filename, author, descrip)
     def AddFileInclude(self, filelist):
         self._fileinclude.AddProperty(filelist)
     def AddFunc(self, func):
         self._funclist.append(func)
     def GetStr(self):
+        tmplist = self._filename.upper().split('.')
+        fn = '_'.join(tmplist) + '_'
         tmpstr = ''
         # file head
         tmpstr += '\n'.join(self._filehead.GetList()) + '\n\n'
+        # anti redefine
+        if self._declare:
+            tmpstr += '#ifndef %s\n#define %s\n\n' % (fn, fn)
         # file include
-        tmpstr += '\n'.join(self._fileinclude.GetList()) + '\n\n'
+        if len(self._fileinclude.GetList()) > 1:
+            # list[0] is comment
+            tmpstr += '\n'.join(self._fileinclude.GetList()) + '\n\n'
         # functions
         for func in self._funclist:
             tmpstr += '\n'.join(func.GetList(self._indentationNum)) + '\n\n'
+        # anti redefine
+        if self._declare:
+            tmpstr += '#endif  // #ifndef %s\n' % fn
         # file end
         tmpstr += '// file end: ' + self._filehead._filename
         return tmpstr
