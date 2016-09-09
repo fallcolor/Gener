@@ -53,7 +53,7 @@ def StartGui():
 
     fr = Frame(root)
     fr.pack(fill = X)
-    saveBtn = Button(fr, text = "save config", command = SaveData)
+    saveBtn = Button(fr, text = "save config", command = SaveSvFile)
     saveBtn.pack(side = LEFT)
     geneBtn = Button(fr, text = "generate code", command = GenerateCode)
     geneBtn.pack(side = LEFT)
@@ -88,6 +88,13 @@ def DisplayFunc(mapcfg):
     else:
         msgFrame.Refresh(mapcfg)
         sglFrame.Refresh(mapcfg)
+
+def SaveSvFile():
+    SaveData()
+    if mc._svfname == '':
+        tkMessageBox.showinfo("Error", "No sv file path")
+    else:
+        mc.ExportSvToFile()
 
 def SaveData():
     ecuchks, msgcfgs = msgFrame.GetValue()

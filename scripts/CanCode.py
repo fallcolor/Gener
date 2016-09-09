@@ -73,7 +73,7 @@ def GetPackStr(dataStr, x1, x2, x3, x4):
         restr = '(' + restr + ') >> %d' % x3
     if x4 != 0:
         restr = '(' + restr + ') << %d' % x4
-    restr = 'data[%d] += ' % x1 + restr + ';'
+    restr = 'data[%d] += (uint8_T)(' % x1 + restr + ');'
     return restr
 
 def GetPackBitField(packedlen, length):
@@ -87,7 +87,7 @@ def UnpackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):
     '''
     _length = length
     _startbit = startbit
-    relist = ['uint32_T tmpValue = 0;']
+    relist = ['tmpValue = 0;']
     if startbit + length > 64:
         return ['// Error: length of signal out of range']
 
@@ -115,7 +115,7 @@ def UnpackSignal(sglName, sglType, dataStr, startbit, length, factor, offset):
             _length = 0
         tmpstr = 'tmpValue += ' + tmpstr + ';'
         relist.append(tmpstr)
-    relist.append('%s = (%s)tempValue * %s + %s;' % (sglName, sglType, factor, offset))
+    relist.append('%s = (%s)tmpValue * %s + %s;' % (sglName, sglType, factor, offset))
     return relist
 
 def GetUnpackStr(dataStr, x1, x2, x3, x4):

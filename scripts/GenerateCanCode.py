@@ -30,7 +30,7 @@ def GenerateCanCode(mc):
     # message config initiation: .c
     initfunc = fc.FuncBody()
     initfunc.AddFuncComment('CAN frame initiation')
-    initfunc.AddFuncName('CAN_uMsg_Init')
+    initfunc.AddFuncName('CAN_userMsg_Init')
     # message config
     for msg in mc._msgcfgs:
         if msg._checked:
@@ -58,15 +58,15 @@ def GenerateCanCode(mc):
     hfile.AddFunc(hinitfunc)
 
     # custom can config: .c
-    cstmfunc = fc.FuncBody()
-    cstmfunc.AddFuncComment('CAN custom config')
-    cstmfunc.AddFuncName('CAN_uCustom_Func')
-    cfile.AddFunc(cstmfunc)
+    # cstmfunc = fc.FuncBody()
+    # cstmfunc.AddFuncComment('CAN custom config')
+    # cstmfunc.AddFuncName('CAN_uCustom_Func')
+    # cfile.AddFunc(cstmfunc)
 
-    hcstmfunc = fc.FuncBody()
-    hcstmfunc.CopyFromAnother(cstmfunc)
-    hcstmfunc._declare = True
-    hfile.AddFunc(hcstmfunc)
+    # hcstmfunc = fc.FuncBody()
+    # hcstmfunc.CopyFromAnother(cstmfunc)
+    # hcstmfunc._declare = True
+    # hfile.AddFunc(hcstmfunc)
 
     # signal task: .c
     for fr in mc._dbc._fl._list:
@@ -90,7 +90,7 @@ def GenerateCanCode(mc):
             func.AddFuncName('pack_%s' % fr._Id)
         else:
             func.AddFuncName('unpack_%s' % fr._Id)
-        func.AddFuncPara('char* data')
+        func.AddFuncPara('uint8_T* data')
         func.AddFuncEle(fc.FuncEle(['temp variable'], ['uint32_T tmpValue;']))
         # add signal
         for sgl in fr._signals:

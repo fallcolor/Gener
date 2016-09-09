@@ -71,7 +71,7 @@ class SignalMapControl(Frame):
         # self._lf = LabelFrame(rootCom, text = '')
         self._num = Label(self, width = 5, text = varNum)
         self._type = Label(self, width = 8, text = varType, anchor = 'w')
-        self._var = Label(self, width = 17, text = varName, anchor = 'w')
+        self._var = Label(self, width = 47, text = varName, anchor = 'w')
         self._combo1 = ttk.Combobox(self, width = 13)
         self._combo1.state(['readonly'])
         self._combo1.bind('<<ComboboxSelected>>', self.cb1Select)
@@ -286,10 +286,10 @@ class MessageFrameControl(LabelFrame):
             self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
             self._cvs['yscrollcommand'] = self._sb.set
             self._sb['command'] = self._cvs.yview
-        if mc._page == 0:
-            self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
-        else:
-            self._cvs.unbind_all("<MouseWheel>")
+        # if mc._page == 0:
+        #     self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
+        # else:
+        #     self._cvs.unbind_all("<MouseWheel>")
         cnt = 0
         self._cvs.delete('all')
         self._mcList = []
@@ -328,10 +328,10 @@ class SignalFrameControl(Frame):
             self._cvs.pack(side = LEFT, fill = BOTH, expand=True)
             self._cvs['yscrollcommand'] = self._sb.set
             self._sb['command'] = self._cvs.yview
-        if mc._page == 1:
-            self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
-        else:
-            self._cvs.unbind_all("<MouseWheel>")
+        # if mc._page == 1:
+        #     self._cvs.bind_all("<MouseWheel>", self.ProcessWheel)
+        # else:
+        #     self._cvs.unbind_all("<MouseWheel>")
         cnt = 0
         self._cvs.delete('all')
         self._mapList = []

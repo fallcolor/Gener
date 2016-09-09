@@ -233,6 +233,8 @@ class MapConfig(object):
         '''
         refresh the variable of signal maps
         '''
+        self._maps.sort(key = lambda sglmap: sglmap._var)
+        ac._vars.sort(key = lambda sglmap: sglmap[0])
         mpVar = [[mp._var, mp._type] for mp in self._maps]
         acVar = [acvar for acvar in ac._vars]
 
