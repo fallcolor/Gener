@@ -73,7 +73,7 @@ def GetPackStr(dataStr, x1, x2, x3, x4):
         restr = '(' + restr + ') >> %d' % x3
     if x4 != 0:
         restr = '(' + restr + ') << %d' % x4
-    restr = 'data[%d] += (uint8_T)(' % x1 + restr + ');'
+    restr = dataStr + '[%d] += (uint8)(' % x1 + restr + ');'
     return restr
 
 def GetPackBitField(packedlen, length):

@@ -92,17 +92,24 @@ def GenerateCanCode(mc):
             func.AddFuncName('unpack_%s' % fr._Id)
         func.AddFuncPara('uint8_T* data')
         func.AddFuncEle(fc.FuncEle(['temp variable'], ['uint32_T tmpValue;']))
+        # pack message, temperatore parameters
+        if transflag == 1:
+            func.AddFuncEle(fc.FuncEle(['pack signal, temp array'],['uint8 tmpdata[8];']))
         # add signal
         for sgl in fr._signals:
             sglmaps = mc.GetMaps(sgl._name)
             for sm in sglmaps:
                 comlist = cc.GetSignalComm(sm[0], sm[2].split(' ')[0], sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
                 if transflag == 1:
-                    bodylist = cc.PackSignal(sm[0], sm[1], 'data', sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
+                    bodylist = cc.PackSignal(sm[0], sm[1], 'tmpdata', sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)
                 else:
                     bodylist = cc.UnpackSignal(sm[0], sm[1], 'data', sgl._startbit, sgl._signalsize, sgl._factor, sgl._offset)                   
                 func.AddFuncEle(fc.FuncEle(comlist, bodylist))
-        
+        if transflag == 1:
+            tmplist = []
+            for i in range(8):
+                tmplist.append('data[%d] = tmpdata[%d];'%(i, i))
+            func.AddFuncEle(fc.FuncEle(['set value'], tmplist))
         # if len(func._eles) > 1:
         if fr._checked:
             cfile.AddFunc(func)
